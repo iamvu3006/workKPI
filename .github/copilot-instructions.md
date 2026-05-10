@@ -74,6 +74,16 @@ Mọi API (Next.js Route Handlers) đều phải dùng chuẩn trả về này:
 - KHÔNG thay đổi schema Database trong Prisma mà không báo trước hoặc suy nghĩ kỹ (Cần review Edge Cases).
 - KHÔNG cài thêm package bên thứ ba nếu có thể dùng chức năng tương tự có trong chuẩn Next.js hoặc utils chung.
 
+## Context7 — Documentation Rule
+Always use Context7 when I need:
+- Code generation with any external library
+- Setup or configuration steps
+- Library/API documentation
+
+Automatically use Context7 MCP tools to resolve library ID
+and get library docs without me having to explicitly ask.
+Pull docs first, then write code.
+
 ## 📖 Reference Files
 Trước khi viết tính năng mới, hãy dùng `read_file` để kiểm tra các chuẩn có sẵn tại:
 - Supabase SSR Pattern: `utils/supabase/server.ts`, `utils/supabase/client.ts`

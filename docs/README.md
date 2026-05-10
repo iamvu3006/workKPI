@@ -12,6 +12,14 @@ Use it as the source of truth when starting a new session or when an AI assistan
 - [Testing Guide](./testing.md): TDD approach, test layers, and validation rules.
 - [Sprint 1 Plan](./sprint_plan/SPRINT_1_PLAN.md): implementation order, dependencies, and effort estimate for the auth/security sprint.
 - [Sprint 2 Plan](./sprint_plan/SPRINT_2_PLAN.md): implementation order, dependencies, and effort estimate for the session lifecycle and abuse-protection sprint.
+- [Sprint 3 Plan](./sprint_plan/SPRINT_3_PLAN.md): implementation order, dependencies, and effort estimate for user experience, admin operations, and governance.
+- [Sprint 4 Plan](./sprint_plan/SPRINT_4_PLAN.md): implementation order, dependencies, and effort estimate for task foundation and authoring.
+- [Sprint 5 Plan](./sprint_plan/SPRINT_5_PLAN.md): implementation order, dependencies, and effort estimate for task lifecycle and collaboration.
+- [Sprint 6 Plan](./sprint_plan/SPRINT_6_PLAN.md): implementation order, dependencies, and effort estimate for task views and planning.
+- [Sprint 7 Plan](./sprint_plan/SPRINT_7_PLAN.md): implementation order, dependencies, and effort estimate for task automation and structure.
+- [Sprint 8 Plan](./sprint_plan/SPRINT_8_PLAN.md): implementation order, dependencies, and effort estimate for KPI metrics and reporting.
+- [Sprint 9 Plan](./sprint_plan/SPRINT_9_PLAN.md): implementation order, dependencies, and effort estimate for task platform hardening and edge cases.
+- [Sprint 10 Plan](./sprint_plan/SPRINT_10_PLAN.md): implementation order, dependencies, and effort estimate for release readiness and stabilization.
 
 ## How To Use
 
@@ -21,6 +29,14 @@ Use it as the source of truth when starting a new session or when an AI assistan
 - Read [Testing Guide](./testing.md) before writing or changing code.
 - Read [Sprint 1 Plan](./sprint_plan/SPRINT_1_PLAN.md) for the auth/security baseline.
 - Read [Sprint 2 Plan](./sprint_plan/SPRINT_2_PLAN.md) when implementing the session/security sprint.
+- Read [Sprint 3 Plan](./sprint_plan/SPRINT_3_PLAN.md) for profile, admin, and governance work.
+- Read [Sprint 4 Plan](./sprint_plan/SPRINT_4_PLAN.md) for task authoring and assignment work.
+- Read [Sprint 5 Plan](./sprint_plan/SPRINT_5_PLAN.md) for task execution and collaboration work.
+- Read [Sprint 6 Plan](./sprint_plan/SPRINT_6_PLAN.md) for task view and planning work.
+- Read [Sprint 7 Plan](./sprint_plan/SPRINT_7_PLAN.md) for automation, dependencies, and subtasks.
+- Read [Sprint 8 Plan](./sprint_plan/SPRINT_8_PLAN.md) for KPI calculations and reporting.
+- Read [Sprint 9 Plan](./sprint_plan/SPRINT_9_PLAN.md) for hardening and edge-case handling.
+- Read [Sprint 10 Plan](./sprint_plan/SPRINT_10_PLAN.md) for release readiness and stabilization.
 
 ## Maintenance Rules
 
