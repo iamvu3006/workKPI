@@ -1,5 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Project Docs
+
+The durable project context lives in [docs/README.md](docs/README.md).
+
+Start there if you need product scope, architecture, decisions, testing guidance, or the current sprint plan.
+
 ## Getting Started
 
 First, run the development server:
