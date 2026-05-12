@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { loginSchema } from "@/lib/auth/validation";
 
 export function LoginForm() {
   const router = useRouter();
@@ -18,6 +19,19 @@ export function LoginForm() {
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage(null);
+
+    // Validate input client-side
+    const validationResult = loginSchema.safeParse({
+      email,
+      password,
+    });
+
+    if (!validationResult.success) {
+      const emailError = validationResult.error.flatten().fieldErrors.email?.[0];
+      const passwordError = validationResult.error.flatten().fieldErrors.password?.[0];
+      setErrorMessage(emailError || passwordError || "Enter a valid company email and password.");
+      return;
+    }
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -47,7 +61,7 @@ export function LoginForm() {
     });
 
     if (error) {
-      setErrorMessage(error.message);
+      setErrorMessage(`Google sign-in failed: ${error.message}`);
     }
   };
 

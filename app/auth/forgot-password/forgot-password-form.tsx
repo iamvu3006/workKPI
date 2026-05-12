@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
+import { forgotPasswordSchema } from "@/lib/auth/validation";
 
 export function ForgotPasswordForm() {
   const supabase = createClient();
@@ -13,8 +14,20 @@ export function ForgotPasswordForm() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setIsSubmitting(true);
     setFeedback(null);
+
+    // Validate input client-side
+    const validationResult = forgotPasswordSchema.safeParse({
+      email,
+    });
+
+    if (!validationResult.success) {
+      const emailError = validationResult.error.flatten().fieldErrors.email?.[0];
+      setFeedback(emailError || "Enter a valid email address.");
+      return;
+    }
+
+    setIsSubmitting(true);
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/update-password`,
