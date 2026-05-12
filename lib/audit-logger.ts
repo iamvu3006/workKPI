@@ -1,13 +1,15 @@
+import { type AuditAction as PrismaAuditAction, type Prisma } from "@prisma/client";
+
 import { prisma } from "@/lib/db/prisma";
 
-export type AuditAction = "login" | "logout" | "reset_password";
+export type AuditAction = PrismaAuditAction;
 
 interface AuditLogInput {
   actorUserId?: string | null;
   action: AuditAction;
   entityType: string;
   entityId?: string | null;
-  metadata?: Record<string, unknown>;
+  metadata?: Prisma.InputJsonValue;
 }
 
 export async function writeAuditLog({
@@ -24,6 +26,7 @@ export async function writeAuditLog({
         action,
         entityType,
         entityId,
+        metadata,
       },
     });
   } catch (error) {

@@ -18,6 +18,8 @@ enum AuditAction {
   login
   logout
   reset_password
+  lock_account
+  unlock_account
 }
 
 model Profile {
@@ -28,10 +30,15 @@ model Profile {
   locale      String     @default("vi-VN")
   timeZone    String     @default("Asia/Ho_Chi_Minh") @map("time_zone")
   lastLoginAt DateTime?  @map("last_login_at") @db.Timestamptz(6)
+  lockedUntil DateTime?  @map("locked_until") @db.Timestamptz(6)
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   auditLogs AuditLog[]
+  sessions  UserSession[]
+  loginAttempts LoginAttempt[]
+  trustedDevices TrustedDevice[]
+  notifications Notification[]
 
   @@map("profiles")
 }
@@ -51,4 +58,78 @@ model AuditLog {
   @@index([entityType, entityId], map: "idx_audit_logs_entity_type_entity_id")
   @@index([createdAt], map: "idx_audit_logs_created_at")
   @@map("audit_logs")
+}
+
+model TrustedDevice {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  deviceFingerprint String   @map("device_fingerprint")
+  deviceName       String?   @map("device_name")
+  ipAddress        String?   @map("ip_address")
+  userAgent        String?   @map("user_agent")
+  trustedUntil     DateTime  @map("trusted_until") @db.Timestamptz(6)
+  lastSeenAt       DateTime? @map("last_seen_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, deviceFingerprint], map: "ux_trusted_devices_user_fingerprint")
+  @@index([trustedUntil], map: "idx_trusted_devices_trusted_until")
+  @@map("trusted_devices")
+}
+
+model LoginAttempt {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email         String
+  userId        String?   @map("user_id") @db.Uuid
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  success       Boolean   @default(false)
+  failureReason String?   @map("failure_reason")
+  attemptedAt   DateTime  @default(now()) @map("attempted_at") @db.Timestamptz(6)
+
+  user Profile? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email, attemptedAt(sort: Desc)], map: "idx_login_attempts_email_attempted_at")
+  @@index([userId, attemptedAt(sort: Desc)], map: "idx_login_attempts_user_id_attempted_at")
+  @@map("login_attempts")
+}
+
+model UserSession {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  sessionTokenHash String    @unique @map("session_token_hash")
+  deviceName       String?   @map("device_name")
+  ipAddress        String?   @map("ip_address")
+  userAgent        String?   @map("user_agent")
+  isCurrent        Boolean   @default(false) @map("is_current")
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  lastSeenAt       DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, lastSeenAt(sort: Desc)], map: "idx_user_sessions_user_id_last_seen_at")
+  @@index([expiresAt], map: "idx_user_sessions_expires_at")
+  @@map("user_sessions")
+}
+
+model Notification {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  type      String
+  title     String
+  body      String
+  payload   Json     @default("{}")
+  readAt    DateTime? @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_id_created_at")
+  @@index([userId, readAt], map: "idx_notifications_user_id_read_at")
+  @@map("notifications")
 }

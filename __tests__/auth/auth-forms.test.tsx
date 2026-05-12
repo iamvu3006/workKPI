@@ -51,7 +51,7 @@ describe("LoginForm", () => {
       expect(signInWithPassword).not.toHaveBeenCalled();
     });
 
-    expect(screen.getByText(/enter a valid company email/i)).toBeInTheDocument();
+    expect(screen.getByText(/invalid email address/i)).toBeInTheDocument();
   });
 
   it("surfaces a friendly Google SSO error state", async () => {
@@ -82,6 +82,6 @@ describe("ForgotPasswordForm", () => {
       expect(resetPasswordForEmail).not.toHaveBeenCalled();
     });
 
-    expect(screen.getByText(/enter a valid email/i)).toBeInTheDocument();
+    expect(screen.getByText(/invalid email address/i)).toBeInTheDocument();
   });
 });

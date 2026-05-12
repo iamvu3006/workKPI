@@ -14,6 +14,7 @@ export function LoginForm() {
   const [isPending, startTransition] = useTransition();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberDevice, setRememberDevice] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -24,6 +25,7 @@ export function LoginForm() {
     const validationResult = loginSchema.safeParse({
       email,
       password,
+      rememberDevice,
     });
 
     if (!validationResult.success) {
@@ -115,7 +117,12 @@ export function LoginForm() {
 
       <div className="flex items-center justify-between text-sm text-slate-600">
         <label className="inline-flex items-center gap-2">
-          <input type="checkbox" className="size-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500" />
+          <input
+            type="checkbox"
+            className="size-4 rounded border-slate-300 text-teal-600 focus:ring-teal-500"
+            checked={rememberDevice}
+            onChange={(event) => setRememberDevice(event.target.checked)}
+          />
           Nhớ thiết bị này
         </label>
         <Link href="/auth/forgot-password" className="font-medium text-teal-700 underline decoration-teal-300 underline-offset-4">
