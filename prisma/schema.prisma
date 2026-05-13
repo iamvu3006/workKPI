@@ -20,17 +20,33 @@ enum AuditAction {
   reset_password
   lock_account
   unlock_account
+  profile_updated
+  avatar_uploaded
+  avatar_deleted
+  password_changed
+  settings_updated
 }
+ 
 
 model Profile {
   id          String     @id @db.Uuid
   email       String     @unique
   fullName    String?    @map("full_name")
+  phone       String?
+  avatarUrl   String?    @map("avatar_url")
+  avatarUploadedAt DateTime? @map("avatar_uploaded_at") @db.Timestamptz(6)
+
   status      UserStatus @default(active)
+  theme       String     @default("light")
   locale      String     @default("vi-VN")
   timeZone    String     @default("Asia/Ho_Chi_Minh") @map("time_zone")
   lastLoginAt DateTime?  @map("last_login_at") @db.Timestamptz(6)
   lockedUntil DateTime?  @map("locked_until") @db.Timestamptz(6)
+
+  notificationEmail Boolean @default(true) @map("notification_email")
+  keyboardShortcuts String? @map("keyboard_shortcuts")
+  defaultTaskFilter String? @map("default_task_filter")
+
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
