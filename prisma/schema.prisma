@@ -8,10 +8,16 @@ datasource db {
 }
 
 enum UserStatus {
-  active
-  inactive
-  locked
-  disabled
+  ACTIVE
+  DISABLED
+}
+
+enum UserRole {
+  ADMIN
+  DIRECTOR
+  MANAGER
+  LEADER
+  EMPLOYEE
 }
 
 enum AuditAction {
@@ -32,11 +38,17 @@ model Profile {
   id          String     @id @db.Uuid
   email       String     @unique
   fullName    String?    @map("full_name")
+  displayName String?    @map("display_name")
   phone       String?
   avatarUrl   String?    @map("avatar_url")
   avatarUploadedAt DateTime? @map("avatar_uploaded_at") @db.Timestamptz(6)
 
-  status      UserStatus @default(active)
+  role               UserRole   @default(EMPLOYEE)
+  status             UserStatus @default(ACTIVE)
+  forcePasswordChange Boolean    @default(false) @map("force_password_change")
+  departmentId       String?    @map("department_id") @db.Uuid
+  teamId             String?    @map("team_id") @db.Uuid
+
   theme       String     @default("light")
   locale      String     @default("vi-VN")
   timeZone    String     @default("Asia/Ho_Chi_Minh") @map("time_zone")
@@ -50,12 +62,22 @@ model Profile {
   createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
 
+  // Relations
+  department  Department? @relation("DepartmentMembers", fields: [departmentId], references: [id], onDelete: SetNull)
+  team        Team?       @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  managedDepartments Department[] @relation("DepartmentManager")
+  leadTeams   Team[]      @relation("TeamLeader")
+
   auditLogs AuditLog[]
   sessions  UserSession[]
   loginAttempts LoginAttempt[]
   trustedDevices TrustedDevice[]
   notifications Notification[]
 
+  @@index([departmentId], map: "idx_profiles_department_id")
+  @@index([teamId], map: "idx_profiles_team_id")
+  @@index([role], map: "idx_profiles_role")
+  @@index([status], map: "idx_profiles_status")
   @@map("profiles")
 }
 
@@ -148,4 +170,40 @@ model Notification {
   @@index([userId, createdAt(sort: Desc)], map: "idx_notifications_user_id_created_at")
   @@index([userId, readAt], map: "idx_notifications_user_id_read_at")
   @@map("notifications")
+}
+
+model Department {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String   @unique
+  code        String   @unique
+  description String?
+  managerId   String   @map("manager_id") @db.Uuid
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  manager Profile @relation("DepartmentManager", fields: [managerId], references: [id], onDelete: Restrict)
+  members Profile[] @relation("DepartmentMembers")
+  teams   Team[]
+
+  @@index([managerId], map: "idx_departments_manager_id")
+  @@map("departments")
+}
+
+model Team {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  description   String?
+  leaderId      String   @map("leader_id") @db.Uuid
+  departmentId  String   @map("department_id") @db.Uuid
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  leader     Profile @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Restrict)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  members    Profile[] @relation("TeamMembers")
+
+  @@unique([name, departmentId], map: "ux_teams_name_department_id")
+  @@index([departmentId], map: "idx_teams_department_id")
+  @@index([leaderId], map: "idx_teams_leader_id")
+  @@map("teams")
 }

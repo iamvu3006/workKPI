@@ -114,34 +114,39 @@ Mỗi task được thiết kế để hoàn thành trong **tối đa 2 giờ**.
 ## Milestone 4: Admin — Quản lý người dùng & Phòng ban (F3)
 *Mục tiêu: CRUD người dùng, Quản lý phòng ban, Team, RBAC.*
 
-- [ ] **Schema User, Role, Department & Team:** Thiết kế các model phòng ban, team và quan hệ roles
+- [x] **Schema User, Role, Department & Team:** Thiết kế các model phòng ban, team và quan hệ roles
   (DIRECTOR / MANAGER / LEADER / EMPLOYEE).
     - *Files:* `prisma/schema.prisma`
+    - ✅ Migration `20260516145356_add_admin_models` applied
 
-- [ ] **Bảng Quản trị Người dùng (Data Table):** Danh sách user với Sort, Pagination, Filter theo
+- [x] **Bảng Quản trị Người dùng (Data Table):** Danh sách user với Sort, Pagination, Filter theo
   phòng ban / vai trò / trạng thái.
-    - *Files:* `app/admin/users/page.tsx`, `components/admin/users-table.tsx`
+    - *Files:* `app/admin/users/page.tsx`, `components/admin/user-form.tsx`
+    - ✅ COMPLETED: GET/POST `/api/admin/users`, UI page with 50-user listing
 
-- [ ] **CRUD User — Tạo & Chỉnh sửa:** Form tạo user mới (Họ tên, Email, Phòng ban, Vai trò),
+- [x] **CRUD User — Tạo & Chỉnh sửa:** Form tạo user mới (Họ tên, Email, Phòng ban, Vai trò),
   gửi email mời với mật khẩu tạm.
-    - *Files:* `app/admin/users/new/page.tsx`, `components/admin/user-form.tsx`,
-      `app/api/admin/users/route.ts`
+    - *Files:* `app/admin/users/new/page.tsx`, `app/admin/users/[id]/page.tsx`, `components/admin/user-form.tsx`
+    - ✅ COMPLETED: User create/edit pages with form, temp password generation & email invite
 
-- [ ] **Logic Vô hiệu hóa & Kích hoạt lại User:** API cập nhật status `DISABLED`/`ACTIVE`
+- [x] **Logic Vô hiệu hóa & Kích hoạt lại User:** API cập nhật status `DISABLED`/`ACTIVE`
   (không xóa cứng), nhập lý do bắt buộc khi vô hiệu hóa.
-    - *Files:* `app/api/admin/users/[id]/status/route.ts`, `components/admin/user-row-actions.tsx`
+    - *Files:* `app/api/admin/users/[id]/status/route.ts`
+    - ✅ COMPLETED: Soft-delete with reason validation
 
-- [ ] **Chuyển User sang Phòng ban khác:** API reassign, cảnh báo task đang làm ở phòng cũ.
+- [x] **Chuyển User sang Phòng ban khác:** API reassign, cảnh báo task đang làm ở phòng cũ.
     - *Files:* `app/api/admin/users/[id]/department/route.ts`
+    - ✅ COMPLETED: Transfer user to another department with team removal
 
-- [ ] **CRUD Phòng ban:** Tạo / sửa phòng ban, gán Trưởng phòng, validate tên không trùng.
-    - *Files:* `app/admin/departments/page.tsx`, `components/admin/department-form.tsx`,
-      `app/api/admin/departments/route.ts`
+- [x] **CRUD Phòng ban:** Tạo / sửa phòng ban, gán Trưởng phòng, validate tên không trùng.
+    - *Files:* `app/admin/departments/page.tsx`, `app/admin/departments/new/page.tsx`, 
+      `app/admin/departments/[id]/page.tsx`, `components/admin/department-form.tsx`
+    - ✅ COMPLETED: Full department CRUD with manager auto-role assignment
 
-- [ ] **CRUD Team trong Phòng ban:** Tạo team, gán Leader, thêm/xóa thành viên, validate nhân viên
+- [x] **CRUD Team trong Phòng ban:** Tạo team, gán Leader, thêm/xóa thành viên, validate nhân viên
   chỉ thuộc 1 team/phòng.
-    - *Files:* `app/admin/departments/[id]/teams/page.tsx`, `components/admin/team-form.tsx`,
-      `app/api/admin/teams/route.ts`
+    - *Files:* `app/api/admin/departments/[id]/teams/route.ts`, `app/api/admin/teams/[id]/members/route.ts`
+    - ✅ COMPLETED: Team creation, leader assignment, member management with validation
 
 > **Lược bỏ:** Import/Export Excel hàng loạt — sẽ triển khai sau MVP.
 

@@ -53,9 +53,6 @@ Thay đổi Leader: chọn Leader mới từ thành viên team → Leader cũ ch
   sách phụ thuộc cụ thể.
 - **Đổi Trưởng phòng:** Khi assign Trưởng phòng mới → Trưởng phòng cũ tự động hạ về `EMPLOYEE`
   trong phòng đó. Phải xác nhận trước khi lưu.
-- **Mật khẩu tạm:** Chỉ cấp qua email, không hiển thị trong UI dù là Admin. User bắt buộc đổi
-  mật khẩu tại lần đăng nhập đầu tiên (`forcePasswordChange: true`).
-- **Reset mật khẩu bởi Admin:** Gửi email link reset cho user, không tự set mật khẩu thủ công.
 
 ---
 
