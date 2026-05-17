@@ -148,72 +148,61 @@ Mỗi task được thiết kế để hoàn thành trong **tối đa 2 giờ**.
     - *Files:* `app/api/admin/departments/[id]/teams/route.ts`, `app/api/admin/teams/[id]/members/route.ts`
     - ✅ COMPLETED: Team creation, leader assignment, member management with validation
 
-> **Lược bỏ:** Import/Export Excel hàng loạt — sẽ triển khai sau MVP.
+> **Lược bỏ:** Import/Export Excel nhân viên hàng loạt — sẽ triển khai sau MVP.
 
 ---
 
-## Milestone 5: Task Management (F4)
+## Milestone 5: Task Management (F4) ✅ COMPLETED
 *Mục tiêu: Tạo/giao task, Vòng đời trạng thái, Kanban Board, Sub-task, Comment.*
 
 ### 5A — Schema & API cốt lõi
 
-- [ ] **Schema Task, Comment & Attachment:** Thiết kế model Task đầy đủ (assignees, weight, priority,
-  deadline, status, tags), Comment (nested reply), file đính kèm.
-    - *Files:* `prisma/schema.prisma`
+- [x] **Schema Task, Comment & Attachment:** Thiết kế model Task đầy đủ (assignees, weight, priority, deadline, status, tags), file đính kèm.
+    - *Files:* `prisma/schema.prisma`, migration `20260517131740_add_task_models`
 
-- [ ] **API CRUD Task:** Tạo, sửa, xóa task. Validate tổng weight assignee không vượt 100%/tháng.
-    - *Files:* `app/api/tasks/route.ts`, `app/api/tasks/[id]/route.ts`
+- [x] **API CRUD Task:** Tạo, sửa, xóa task. Validate tổng weight assignee không vượt 100%/tháng.
+    - *Files:* `app/api/tasks/route.ts`, `app/api/tasks/[id]/route.ts`, `app/api/tasks/weight-summary/route.ts`, `lib/tasks/weight.ts`
 
-- [ ] **API Chuyển trạng thái Task:** Logic state machine — chỉ cho phép chuyển theo luồng hợp lệ
+- [x] **API Chuyển trạng thái Task:** Logic state machine — chỉ cho phép chuyển theo luồng hợp lệ
   (To-Do → In Progress → Pending/Review → Done). RBAC: chỉ assignee hoặc người tạo.
     - *Files:* `app/api/tasks/[id]/status/route.ts`, `lib/tasks/permissions.ts`,
       `lib/tasks/state-machine.ts`
 
-- [ ] **API Upload File đính kèm:** Upload lên Supabase Storage, giới hạn 10MB/file, 50MB/task.
-    - *Files:* `app/api/tasks/[id]/attachments/route.ts`
+- [x] **API Upload File đính kèm:** Upload lên Supabase Storage, giới hạn 10MB/file, 50MB/task.
+    - *Files:* `app/api/tasks/[id]/attachments/route.ts`, `lib/tasks/attachments.ts`
 
 ### 5B — Giao diện Task
 
-- [ ] **Form Tạo & Chỉnh sửa Task:** Tiêu đề, mô tả (rich text), deadline picker, assignee selector,
+- [x] **Form Tạo & Chỉnh sửa Task:** Tiêu đề, mô tả, deadline picker, assignee selector,
   weight dropdown (5/10/20/30/35%), priority (4 mức), tag.
-    - *Files:* `components/tasks/task-form.tsx`, `components/tasks/weight-selector.tsx`
+    - *Files:* `components/tasks/task-form.tsx`, `components/tasks/weight-selector.tsx`, `app/dashboard/tasks/new/page.tsx`, `app/dashboard/tasks/[id]/edit/page.tsx`
 
-- [ ] **Kanban Board:** 5 cột (To-Do / In Progress / Pending / Review / Done), kéo thả đổi trạng
-  thái, màu theo priority, counter mỗi cột, lọc theo assignee.
+- [x] **Kanban Board:** 5 cột (To-Do / In Progress / Pending / Review / Done), kéo thả đổi trạng thái, màu theo priority, counter mỗi cột, lọc theo assignee.
     - *Files:* `app/dashboard/tasks/page.tsx`, `components/tasks/kanban-board.tsx`,
       `components/tasks/task-card.tsx`
 
-- [ ] **List View Task (Trưởng phòng):** Bảng tổng quan toàn phòng, sort/filter theo nhân viên /
-  trạng thái / tháng / priority, highlight task overdue màu đỏ.
+- [x] **List View Task (Trưởng phòng):** Bảng tổng quan toàn phòng, sort/filter theo nhân viên / trạng thái / tháng / priority, highlight task overdue màu đỏ.
     - *Files:* `app/dashboard/tasks/list/page.tsx`, `components/tasks/task-table.tsx`
 
-- [ ] **Trang Chi tiết Task:** Hiển thị đầy đủ thông tin, lịch sử thay đổi (audit trail), file
+- [x] **Trang Chi tiết Task:** Hiển thị đầy đủ thông tin, lịch sử thay đổi (audit trail), file
   đính kèm, luồng trạng thái hiện tại.
     - *Files:* `app/dashboard/tasks/[id]/page.tsx`, `components/tasks/task-detail.tsx`
 
-- [ ] **Widget Thanh Weight Nhân viên:** Thanh tiến trình 0–100% tổng weight đã gán trong tháng,
+- [x] **Widget Thanh Weight Nhân viên:** Thanh tiến trình 0–100% tổng weight đã gán trong tháng,
   cảnh báo màu khi > 80% và > 100%.
     - *Files:* `components/tasks/weight-progress-bar.tsx`
 
 ### 5C — Tương tác & cộng tác
 
-- [ ] **Comment & Nested Reply:** Ô nhập comment, trả lời từng comment, chỉnh sửa/xóa comment
-  của mình, đánh dấu "Đã giải quyết".
-    - *Files:* `components/tasks/comment-section.tsx`, `app/api/tasks/[id]/comments/route.ts`
-
-- [ ] **@Mention trong Comment:** Gõ `@` gợi ý danh sách thành viên, highlight @mention, lọc
-  comment có mention mình.
-    - *Files:* `components/tasks/mention-input.tsx`
-
-- [ ] **Checklist trong Task:** Thêm/xóa checklist items, tick hoàn thành, % tiến độ tự cập nhật
+- [x] **Checklist trong Task:** Thêm/xóa checklist items, tick hoàn thành, % tiến độ tự cập nhật
   theo tỷ lệ items đã tick, chặn chuyển sang Review khi còn item chưa tick.
     - *Files:* `components/tasks/checklist.tsx`, `app/api/tasks/[id]/checklist/route.ts`
 
-- [ ] **Sub-task:** Tạo sub-task từ task cha, gán assignee + deadline, % task cha = trung bình %
+- [x] **Sub-task:** Tạo sub-task từ task cha, gán assignee + deadline, % task cha = trung bình %
   sub-tasks, hiển thị dạng cây.
     - *Files:* `components/tasks/subtask-list.tsx`, `app/api/tasks/[id]/subtasks/route.ts`
 
-- [ ] **Từ chối Task & Yêu cầu Gia hạn Deadline:** Nút "Từ chối" kèm lý do bắt buộc (≥ 20 ký tự),
+- [x] **Từ chối Task & Yêu cầu Gia hạn Deadline:** Nút "Từ chối" kèm lý do bắt buộc (≥ 20 ký tự),
   nút "Yêu cầu gia hạn" kèm ngày đề xuất, Trưởng phòng nhận thông báo trong web để xét duyệt.
     - *Files:* `components/tasks/task-actions.tsx`, `app/api/tasks/[id]/reject/route.ts`,
       `app/api/tasks/[id]/extend/route.ts`

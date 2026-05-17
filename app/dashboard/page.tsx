@@ -33,11 +33,19 @@ export default async function DashboardPage() {
           {[
             ["Auth state", "Session is hydrated from secure cookies and refreshed by middleware."],
             ["Sprint 1 focus", "Login, logout, reset password, and session protection come first."],
-            ["Next step", "Wire user identity, role redirect, and account security policies."],
+            ["Tasks", "Kanban board, giao việc và theo dõi trọng số tháng tại /dashboard/tasks."],
           ].map(([title, description]) => (
             <article key={title} className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="text-base font-semibold text-slate-900">{title}</h2>
               <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+              {title === "Tasks" && (
+                <a
+                  href="/dashboard/tasks"
+                  className="mt-3 inline-block text-sm font-medium text-teal-700 hover:underline"
+                >
+                  Mở Kanban →
+                </a>
+              )}
             </article>
           ))}
         </section>
