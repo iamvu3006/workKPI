@@ -8,6 +8,8 @@ export const WEIGHT_WARN_PERCENT = 80;
 export const WEIGHT_MAX_PERCENT = 100;
 export const MIN_REJECT_REASON_LENGTH = 20;
 export const MIN_EXTEND_REASON_LENGTH = 20;
+export const MIN_REVIEW_SUMMARY_LENGTH = 30;
+export const MIN_REVIEW_REJECT_REASON_LENGTH = 20;
 
 export const TASK_ATTACHMENT_BUCKET = "task-attachments";
 export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;

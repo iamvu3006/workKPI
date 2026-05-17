@@ -51,13 +51,19 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     }
 
     if (status === "REVIEW") {
-      if (await hasIncompleteChecklist(id)) {
-        return taskError("Hoàn thành checklist trước khi nộp Review.", "ERR_CHECKLIST", 400);
-      }
+      return taskError(
+        "Vui lòng dùng form Nộp nghiệm thu (bằng chứng + tóm tắt).",
+        "ERR_USE_SUBMIT_REVIEW",
+        400
+      );
     }
 
-    if (status === "DONE" && !canEditTaskMetadata(task, auth.actor)) {
-      return taskError("Chỉ Trưởng phòng mới duyệt Done.", "ERR_FORBIDDEN", 403);
+    if (status === "DONE") {
+      return taskError(
+        "Vui lòng chấm điểm qua form Nghiệm thu.",
+        "ERR_USE_REVIEW",
+        400
+      );
     }
 
     const updateData: Record<string, unknown> = { status };

@@ -60,6 +60,13 @@ enum ExtendRequestStatus {
   APPROVED
   REJECTED
 }
+
+enum KpiGrade {
+  EXCELLENT
+  GOOD
+  PASS
+  NEEDS_IMPROVEMENT
+}
  
 
 model Profile {
@@ -109,6 +116,8 @@ model Profile {
   taskStatusChanges  TaskStatusHistory[]
   extendRequestsMade TaskExtendRequest[] @relation("ExtendRequester")
   extendRequestsReviewed TaskExtendRequest[] @relation("ExtendReviewer")
+  reviewedTasks      Task[]              @relation("TaskReviewer")
+  kpiRecords         KpiRecord[]
 
   @@index([departmentId], map: "idx_profiles_department_id")
   @@index([teamId], map: "idx_profiles_team_id")
@@ -261,6 +270,15 @@ model Task {
   urgentOverrideReason String?       @map("urgent_override_reason")
   startedAt            DateTime?     @map("started_at") @db.Timestamptz(6)
   submittedAt          DateTime?     @map("submitted_at") @db.Timestamptz(6)
+  reviewSummary        String?       @map("review_summary")
+  selfAssessment       Json?         @map("self_assessment")
+  qualityScoreRaw      Int?          @map("quality_score_raw")
+  qualityScore         Int?          @map("quality_score")
+  penaltyDays          Int           @default(0) @map("penalty_days")
+  reviewedAt           DateTime?     @map("reviewed_at") @db.Timestamptz(6)
+  reviewedById         String?       @map("reviewed_by_id") @db.Uuid
+  reviewComment        String?       @map("review_comment")
+  reviewRejectReason   String?       @map("review_reject_reason")
   completedAt          DateTime?     @map("completed_at") @db.Timestamptz(6)
   cancelledAt          DateTime?     @map("cancelled_at") @db.Timestamptz(6)
   deletedAt            DateTime?     @map("deleted_at") @db.Timestamptz(6)
@@ -271,6 +289,7 @@ model Task {
   updatedAt            DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   creator    Profile    @relation("TaskCreator", fields: [createdById], references: [id], onDelete: Restrict)
+  reviewer   Profile?   @relation("TaskReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
   department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
   parentTask Task?      @relation("TaskSubtasks", fields: [parentTaskId], references: [id], onDelete: Cascade)
   subtasks   Task[]     @relation("TaskSubtasks")
@@ -288,7 +307,28 @@ model Task {
   @@index([deadline], map: "idx_tasks_deadline")
   @@index([status], map: "idx_tasks_status")
   @@index([deletedAt], map: "idx_tasks_deleted_at")
+  @@index([reviewedById], map: "idx_tasks_reviewed_by_id")
   @@map("tasks")
+}
+
+model KpiRecord {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  month          Int
+  year           Int
+  totalScore     Float     @map("total_score")
+  grade          KpiGrade
+  taskBreakdown  Json      @map("task_breakdown")
+  onTimeRate     Float     @map("on_time_rate")
+  calculatedAt   DateTime  @default(now()) @map("calculated_at") @db.Timestamptz(6)
+  calculatedById String?   @map("calculated_by_id") @db.Uuid
+
+  user Profile @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year], map: "ux_kpi_records_user_month_year")
+  @@index([year, month], map: "idx_kpi_records_year_month")
+  @@index([userId], map: "idx_kpi_records_user_id")
+  @@map("kpi_records")
 }
 
 model TaskAssignee {
