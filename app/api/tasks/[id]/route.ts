@@ -16,6 +16,7 @@ import {
   parseWeight,
 } from "@/lib/tasks/validation";
 import { checkAssigneeWeight } from "@/lib/tasks/weight";
+import { sendNotification } from "@/lib/notifications/service";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -124,6 +125,23 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       await prisma.taskAssignee.createMany({
         data: assigneeIds.map((assigneeId: string) => ({ taskId: id, assigneeId })),
       });
+
+      // Send TASK_ASSIGNED notifications to new assignees (dedupe by taskId)
+      try {
+        for (const p of profiles) {
+          await sendNotification({
+            userId: p.id,
+            type: "TASK_ASSIGNED",
+            title: `Bạn được giao task: ${task.title}`,
+            body: `Bạn được giao task \"${task.title}\". Vui lòng kiểm tra chi tiết và bắt đầu xử lý.`,
+            payload: { taskId: id },
+            dedupeFields: ["taskId"],
+          });
+        }
+      } catch (e) {
+        // non-fatal: notifications should not block task update
+        console.error("Notification dispatch failed:", e);
+      }
     }
 
     const updated = await prisma.task.update({

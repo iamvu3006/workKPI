@@ -8,10 +8,15 @@ export function buildTaskListWhere(
   params: {
     status?: string;
     assigneeId?: string;
+    creatorId?: string;
     month?: string;
     priority?: string;
     tag?: string;
     departmentId?: string;
+    deadlineFrom?: Date;
+    deadlineTo?: Date;
+    weightMin?: number;
+    weightMax?: number;
   }
 ): Prisma.TaskWhereInput {
   const where: Prisma.TaskWhereInput = {
@@ -28,11 +33,29 @@ export function buildTaskListWhere(
   if (params.tag) {
     where.tags = { has: params.tag };
   }
+  if (params.creatorId) {
+    where.createdById = params.creatorId;
+  }
   if (params.month && /^\d{4}-\d{2}$/.test(params.month)) {
     const [y, m] = params.month.split("-").map(Number);
     const start = new Date(Date.UTC(y, m - 1, 1));
     const end = new Date(Date.UTC(y, m, 0));
     where.deadline = { gte: start, lte: end };
+  }
+
+  if (params.deadlineFrom || params.deadlineTo) {
+    where.deadline = {
+      ...(where.deadline ?? {}),
+      ...(params.deadlineFrom ? { gte: params.deadlineFrom } : {}),
+      ...(params.deadlineTo ? { lte: params.deadlineTo } : {}),
+    };
+  }
+
+  if (params.weightMin !== undefined || params.weightMax !== undefined) {
+    where.weight = {
+      ...(params.weightMin !== undefined ? { gte: params.weightMin } : {}),
+      ...(params.weightMax !== undefined ? { lte: params.weightMax } : {}),
+    };
   }
 
   if (actor.role === "DIRECTOR" || actor.role === "ADMIN") {

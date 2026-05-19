@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import { Checklist } from "@/components/tasks/checklist";
+import { ReviewForm } from "@/components/tasks/review-form";
 import { SubtaskList } from "@/components/tasks/subtask-list";
 import { TaskActions } from "@/components/tasks/task-actions";
 import { Badge } from "@/components/ui/badge";
@@ -100,6 +101,19 @@ export function TaskDetail({ taskId, currentUserId, canEdit }: TaskDetailProps) 
           router.refresh();
         }}
       />
+
+      {status === "REVIEW" && canEdit && (
+        <ReviewForm
+          taskId={taskId}
+          taskTitle={task.title as string}
+          deadline={task.deadline as string}
+          selfAssessment={(task.selfAssessment as any) || undefined}
+          onSuccess={() => {
+            load();
+            router.refresh();
+          }}
+        />
+      )}
 
       {!task.parentTaskId && <SubtaskList parentTaskId={taskId} />}
       <Checklist taskId={taskId} readOnly={!isAssignee && !canEdit} />

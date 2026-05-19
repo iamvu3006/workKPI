@@ -27,14 +27,43 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(100, Math.max(1, parseInt(sp.get("limit") || "50", 10)));
     const skip = (page - 1) * limit;
 
+    const deadlineFrom = sp.get("deadlineFrom");
+    const deadlineTo = sp.get("deadlineTo");
+    const parsedDeadlineFrom = deadlineFrom ? new Date(`${deadlineFrom}T00:00:00.000Z`) : undefined;
+    const parsedDeadlineTo = deadlineTo ? new Date(`${deadlineTo}T23:59:59.999Z`) : undefined;
+    const weightMin = sp.get("weightMin");
+    const weightMax = sp.get("weightMax");
+    const parsedWeightMin = weightMin !== null && weightMin !== "" ? Number(weightMin) : undefined;
+    const parsedWeightMax = weightMax !== null && weightMax !== "" ? Number(weightMax) : undefined;
+    const sortBy = sp.get("sortBy") || "deadline";
+    const sortDir = sp.get("sortDir") === "asc" ? "asc" : "desc";
+
     const where = buildTaskListWhere(auth.actor, {
       status: sp.get("status") ?? undefined,
       assigneeId: sp.get("assigneeId") ?? undefined,
+      creatorId: sp.get("creatorId") ?? undefined,
       month: sp.get("month") ?? undefined,
       priority: sp.get("priority") ?? undefined,
       tag: sp.get("tag") ?? undefined,
       departmentId: sp.get("departmentId") ?? undefined,
+      deadlineFrom: parsedDeadlineFrom,
+      deadlineTo: parsedDeadlineTo,
+      weightMin: Number.isFinite(parsedWeightMin as number) ? (parsedWeightMin as number) : undefined,
+      weightMax: Number.isFinite(parsedWeightMax as number) ? (parsedWeightMax as number) : undefined,
     });
+
+    const orderBy =
+      sortBy === "priority"
+        ? [{ priority: sortDir }, { deadline: "asc" as const }]
+        : sortBy === "createdAt"
+          ? [{ createdAt: sortDir }, { deadline: "asc" as const }]
+          : sortBy === "updatedAt"
+            ? [{ updatedAt: sortDir }, { deadline: "asc" as const }]
+            : sortBy === "weight"
+              ? [{ weight: sortDir }, { deadline: "asc" as const }]
+              : sortBy === "progressPercent"
+                ? [{ progressPercent: sortDir }, { deadline: "asc" as const }]
+                : [{ deadline: sortDir }, { createdAt: "desc" as const }];
 
     const [total, tasks] = await Promise.all([
       prisma.task.count({ where }),
@@ -42,7 +71,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: [{ priority: "desc" }, { deadline: "asc" }],
+        orderBy,
         include: taskListInclude,
       }),
     ]);

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Select } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
+import { NotificationPreferences } from "@/components/profile/notification-preferences"
 import { updateSettingsSchema, type UpdateSettingsInput } from "@/lib/profile/validation"
 
 interface Profile {
@@ -182,6 +183,10 @@ export function SettingsForm({ profile }: SettingsFormProps) {
         disabled={isPending}
         hint="Nhận thông báo về bảo mật, task, và các sự kiện quan trọng"
       />
+
+      <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <NotificationPreferences />
+      </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-2">

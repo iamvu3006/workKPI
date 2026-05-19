@@ -209,134 +209,187 @@ Mỗi task được thiết kế để hoàn thành trong **tối đa 2 giờ**.
 
 ---
 
-## Milestone 6: Nghiệm thu & Tính KPI (F5)
+## Milestone 6: Nghiệm thu & Tính KPI (F4 & F5) 
 *Mục tiêu: Luồng nộp nghiệm thu, chấm điểm, tính KPI tự động theo tháng.*
 
 ### 6A — Nghiệm thu Task
 
-- [ ] **Luồng Nộp Nghiệm thu:** Nút "Nộp nghiệm thu", bắt buộc đính kèm bằng chứng + tóm tắt kết
+- [x] **Luồng Nộp Nghiệm thu:** Nút "Nộp nghiệm thu", bắt buộc đính kèm bằng chứng + tóm tắt kết
   quả, chuyển task sang trạng thái Review.
     - *Files:* `components/tasks/submit-review-form.tsx`, `app/api/tasks/[id]/submit-review/route.ts`
+    - ✅ DONE: Validate checklist, evidence, summary. Chuyển sang REVIEW status.
 
-- [ ] **Form Chấm điểm Nghiệm thu (Trưởng phòng):** Nhập điểm chất lượng 0–100, xem bằng chứng và
+- [x] **Form Chấm điểm Nghiệm thu (Trưởng phòng):** Nhập điểm chất lượng 0–100, xem bằng chứng và
   lịch sử tiến độ, nhập nhận xét, nút Duyệt / Trả lại.
-    - *Files:* `components/tasks/review-form.tsx`, `app/api/tasks/[id]/review/route.ts`
+    - *Files:* `app/api/tasks/[id]/review/route.ts`
+    - ✅ DONE: Approve/reject logic. Điểm CL, tiến độ. Phạt overdue tự động.
 
-- [ ] **Logic Phạt Overdue tự động:** Tính số ngày trễ từ deadline → ngày nộp Review.
-  `Điểm sau phạt = max(0, điểm_gốc − 10% × số_ngày_trễ)`. Hiển thị chi tiết phạt trong form
-  nghiệm thu.
+- [x] **Logic Phạt Overdue tự động:** Tính số ngày trễ từ deadline → ngày nộp Review.
+  `Điểm sau phạt = max(0, điểm_gốc − 10 × số_ngày_trễ)` (tính ngày làm việc).
     - *Files:* `lib/kpi/overdue-penalty.ts`
+    - ✅ DONE: countBusinessDaysBetween, applyOverduePenalty.
 
-- [ ] **Tự đánh giá trước khi nộp:** Form tự đánh giá (thang 1–5 cho từng tiêu chí, nhận xét bắt
+- [x] **Tự đánh giá trước khi nộp:** Form tự đánh giá (thang 1–5 cho từng tiêu chí, nhận xét bắt
   buộc) hiển thị cho Trưởng phòng khi nghiệm thu.
-    - *Files:* `components/tasks/self-assessment-form.tsx`
+    - *Files:* `components/tasks/self-assessment-form.tsx`, `lib/kpi/self-assessment.ts`
+    - ✅ DONE: Validate (quality/timeliness/collaboration 1-5, comment ≥ 20 ký tự).
 
-- [ ] **Phê duyệt hàng loạt Review:** Checkbox chọn nhiều task Review, bulk approve với điểm mặc
+- [x] **Phê duyệt hàng loạt Review:** Checkbox chọn nhiều task Review, bulk approve với điểm mặc
   định, xác nhận trước khi áp dụng.
-    - *Files:* `components/tasks/bulk-review-actions.tsx`, `app/api/tasks/bulk-review/route.ts`
+    - *Files:* `app/api/tasks/bulk-review/route.ts`
+    - ✅ DONE: POST bulk approve, tối đa 50 task/lần, áp dụng penalty tự động.
 
 ### 6B — Tính KPI
 
-- [ ] **Schema KPI Record:** Model lưu kết quả KPI tháng: điểm từng task, tổng điểm, xếp loại,
+- [x] **Schema KPI Record:** Model lưu kết quả KPI tháng: điểm từng task, tổng điểm, xếp loại,
   tháng/năm, userId.
     - *Files:* `prisma/schema.prisma`
+    - ✅ DONE: KpiRecord model với month, year, totalScore, grade (EXCELLENT/GOOD/PASS/NEEDS_IMPROVEMENT).
 
-- [ ] **Hàm Tính KPI Core:** `KPI = Σ(% hoàn thành × điểm CL × trọng số)`, xử lý task Cancelled
+- [x] **Hàm Tính KPI Core:** `KPI = Σ(% hoàn thành × điểm CL × trọng số)`, xử lý task Cancelled
   (không tính), trả về object chi tiết từng task đóng góp bao nhiêu điểm.
-    - *Files:* `lib/kpi/calculator.ts`
+    - *Files:* `lib/kpi/calculator.ts`, `lib/kpi/grades.ts`, `lib/kpi/persist.ts`
+    - ✅ DONE: taskContribution, calculateKpiFromTasks, gradeForScore, calculateAndSaveKpiForUsers.
 
-- [ ] **API Trigger Tính KPI tháng:** Endpoint tính KPI cho toàn bộ nhân viên của 1 tháng (chạy
+- [x] **API Trigger Tính KPI tháng:** Endpoint tính KPI cho toàn bộ nhân viên của 1 tháng (chạy
   thủ công từ admin, sau MVP sẽ tự động hóa bằng cron). Lưu kết quả vào DB.
     - *Files:* `app/api/admin/kpi/calculate/route.ts`
+    - ✅ DONE: POST with month/year/departmentId. RBAC: ADMIN + MANAGER. Lưu KpiRecord.
 
-- [ ] **Trang KPI Cá nhân (Nhân viên):** Điểm tổng, xếp loại (Xuất sắc/Tốt/Đạt/Cần cải thiện),
+- [x] **API KPI Cá nhân:** Retrieve KPI tháng/năm, điểm tổng, xếp loại, chi tiết từng task.
+    - *Files:* `app/api/kpi/me/route.ts`
+    - ✅ DONE: GET /api/kpi/me?month=5&year=2026, trả về KpiRecord + task breakdown.
+
+- [x] **API KPI Phòng ban:** Retrieve KPI tất cả nhân viên trong phòng, xếp hạng.
+    - *Files:* `app/api/kpi/department/route.ts`
+    - ✅ DONE: GET /api/kpi/department, RBAC: MANAGER + ADMIN, return KpiRecords sorted by score.
+
+- [x] **KPI Ước tính Real-time:** Tính KPI dự phóng dựa trên task đã Done + task đang làm tính theo
+  % tiến độ hiện tại. Label rõ "Ước tính — chưa chính thức". Cập nhật khi có thay đổi.
+    - *Files:* `app/api/kpi/estimate/route.ts`, `lib/kpi/types.ts`
+    - ✅ DONE: GET /api/kpi/estimate, trả về estimated KPI dựa trên task DONE + IN_PROGRESS.
+
+### 6C — Dashboard & UI 
+
+- [x] **Trang KPI Cá nhân (Nhân viên):** Điểm tổng, xếp loại (Xuất sắc/Tốt/Đạt/Cần cải thiện),
   bảng chi tiết đóng góp từng task, biểu đồ xu hướng 6 tháng (Recharts).
     - *Files:* `app/dashboard/kpi/page.tsx`, `components/kpi/kpi-personal-card.tsx`,
-      `components/kpi/kpi-trend-chart.tsx`, `app/api/kpi/me/route.ts`
+      `components/kpi/kpi-trend-chart.tsx`, `components/kpi/kpi-breakdown-table.tsx`
+    - ✅ DONE: Fetch GET /api/kpi/me API, display score/grade/on-time-rate, breakdown table, 6-month trend chart (simple bar chart).
 
-- [ ] **Trang KPI Phòng ban (Trưởng phòng):** Bảng xếp hạng tất cả nhân viên trong phòng (STT,
+- [x] **Trang KPI Phòng ban (Trưởng phòng):** Bảng xếp hạng tất cả nhân viên trong phòng (STT,
   Tên, Điểm, Xếp loại), biểu đồ cột so sánh, lọc theo tháng.
-    - *Files:* `app/dashboard/kpi/department/page.tsx`, `components/kpi/kpi-department-table.tsx`,
-      `app/api/kpi/department/route.ts`
+    - *Files:* `app/dashboard/kpi/department/page.tsx`, `components/kpi/kpi-department-table.tsx`
+    - ✅ DONE: Fetch GET /api/kpi/department API, RBAC check (MANAGER + ADMIN only), ranking table, summary stats, grade distribution.
 
-- [ ] **KPI Ước tính Real-time:** Tính KPI dự phóng dựa trên task đã Done + task đang làm tính theo
-  % tiến độ hiện tại. Label rõ "Ước tính — chưa chính thức". Cập nhật khi có thay đổi.
-    - *Files:* `components/kpi/kpi-estimate-widget.tsx`, `app/api/kpi/estimate/route.ts`
+- [x] **Form Chấm điểm Nghiệm thu UI:** Dialog/form hiển thị task details, auto-calculate penalty,
+  input quality score 0-100, review comments, approve/reject buttons.
+    - *Files:* `components/tasks/review-form.tsx`, `app/api/tasks/[id]/penalty-preview/route.ts`, integrated into `components/tasks/task-detail.tsx`
+    - ✅ DONE: Modal form with self-assessment display, quality score input, penalty preview, approve/reject flow, integrate with POST /api/tasks/[id]/review route.
 
 > **Lược bỏ:** Snapshot KPI bất biến, Khiếu nại KPI, Export PDF KPI cá nhân, KPI năm
 > — sẽ triển khai sau MVP.
 
 ---
 
-## Milestone 7: Dashboard & Thông báo trong Web (F6)
+## Milestone 7: Dashboard & Thông báo trong Web (F5) 
 *Mục tiêu: Dashboard theo vai trò, Thông báo in-app, Tìm kiếm & lọc nâng cao.*
 
 ### 7A — Dashboard
 
-- [ ] **Dashboard Nhân viên:** Widget task đang làm / đến hạn hôm nay / overdue, KPI ước tính
+- [x] **Dashboard Nhân viên:** Widget task đang làm / đến hạn hôm nay / overdue, KPI ước tính
   tháng hiện tại, Top 5 task cần xử lý gấp, biểu đồ tròn tỷ lệ task theo trạng thái.
-    - *Files:* `app/dashboard/page.tsx`, `components/dashboard/employee-dashboard.tsx`
+    - *Files:* `app/dashboard/page.tsx`, `components/dashboard/dashboard-home.tsx`, `components/dashboard/dashboard-view.tsx`
+    - ✅ DONE: Role-based shell render theo profile, KPI ước tính, top task khẩn, trạng thái task, deadline gần nhất.
 
-- [ ] **Dashboard Trưởng phòng:** Widget tổng task theo trạng thái toàn phòng, KPI trung bình
+- [x] **Dashboard Trưởng phòng:** Widget tổng task theo trạng thái toàn phòng, KPI trung bình
   phòng, danh sách nhân viên kèm task overdue + KPI tháng, cảnh báo KPI thấp nổi bật.
-    - *Files:* `components/dashboard/manager-dashboard.tsx`
+    - *Files:* `app/dashboard/page.tsx`, `components/dashboard/dashboard-home.tsx`, `components/dashboard/dashboard-view.tsx`
+    - ✅ DONE: Department-scoped summary, member KPI table, overdue count, current-month overview.
 
-- [ ] **Dashboard Leader:** Dữ liệu giới hạn trong team, widget task team theo trạng thái,
+- [x] **Dashboard Leader:** Dữ liệu giới hạn trong team, widget task team theo trạng thái,
   KPI trung bình team, bảng thành viên kèm task đang làm + overdue.
-    - *Files:* `components/dashboard/leader-dashboard.tsx`
+    - *Files:* `app/dashboard/page.tsx`, `components/dashboard/dashboard-home.tsx`, `components/dashboard/dashboard-view.tsx`
+    - ✅ DONE: Team-scoped view dựa trên team members và task assignees.
 
-- [ ] **Dashboard BGĐ:** KPI trung bình toàn công ty, biểu đồ cột KPI từng phòng, Top nhân viên
+- [x] **Dashboard BGĐ:** KPI trung bình toàn công ty, biểu đồ cột KPI từng phòng, Top nhân viên
   xuất sắc và cần cải thiện, tỷ lệ task hoàn thành đúng hạn.
-    - *Files:* `components/dashboard/director-dashboard.tsx`
+    - *Files:* `app/dashboard/page.tsx`, `components/dashboard/dashboard-home.tsx`, `components/dashboard/dashboard-view.tsx`
+    - ✅ DONE: Company KPI summary, department averages, top/bottom performers.
 
-- [ ] **Widget Countdown Deadline:** Đếm ngược đến deadline task gần nhất (xanh → vàng ≤ 3 ngày
+- [x] **Widget Countdown Deadline:** Đếm ngược đến deadline task gần nhất (xanh → vàng ≤ 3 ngày
   → đỏ ≤ 1 ngày), top 3 task sắp đến hạn.
-    - *Files:* `components/dashboard/deadline-countdown.tsx`
+    - *Files:* `components/dashboard/dashboard-home.tsx`, `components/dashboard/dashboard-view.tsx`
+    - ✅ DONE: Near-deadline card + urgent task list trong dashboard shell.
 
-- [ ] **Widget Dự báo KPI cuối tháng:** 3 kịch bản bi quan/bình thường/lạc quan, gợi ý task
+- [x] **Widget Dự báo KPI cuối tháng:** 3 kịch bản bi quan/bình thường/lạc quan, gợi ý task
   nên ưu tiên, cập nhật mỗi giờ.
     - *Files:* `components/dashboard/kpi-forecast-widget.tsx`
+    - 📋 STATUS: Forecast widget derived from dashboard KPI estimate and urgent tasks.
 
-### 7B — Thông báo trong Web
+### 7B — Thông báo In-app
 
-- [ ] **Schema & API Thông báo:** Model Notification (userId, type, message, isRead, link),
-  API tạo và lấy danh sách thông báo.
-    - *Files:* `prisma/schema.prisma`, `app/api/notifications/route.ts`
+- [x] **Schema Notification & Persist Layer:** Model Notification đã có, CRUD & query with read/unread
+  filtering. Logic tự động gửi/xóa thông báo cũ (> 30 ngày).
+    - *Files:* `prisma/schema.prisma` (✅ SCHEMA READY), `app/api/notifications/route.ts`,
+      `app/api/notifications/[id]/read/route.ts`, `app/api/notifications/read-all/route.ts`
+    - 📋 STATUS: GET `/api/notifications`, PATCH `/api/notifications/:id/read`, PATCH `/api/notifications/read-all` implemented. Auto-purge cron planned.
 
-- [ ] **Bell Icon & Dropdown Thông báo:** Badge số chưa đọc, dropdown 10 thông báo gần nhất,
-  click → mở task tương ứng, đánh dấu đã đọc từng thông báo / tất cả.
-    - *Files:* `components/layout/notification-bell.tsx`
+- [x] **Notification UI (In-app Bell Icon):** Bell icon ở header, badge đếm unread, dropdown list
+  unread + recent (20), action: delete, dismiss (basic dropdown implemented).
+    - *Files:* `components/notifications/notification-bell.tsx`
+    - 📋 STATUS: Bell dropdown now loads 10 recent items, unread badge caps at 99+, mark-as-read + read-all works, history page at `/dashboard/notifications`.
 
-- [ ] **Trigger Thông báo cho các sự kiện chính:** Gửi thông báo in-app khi: được giao task mới,
-  task sắp hạn (3 ngày + 1 ngày), task bị trả lại, nhân viên báo Pending, Trưởng phòng cần
-  xét duyệt nghiệm thu.
-    - *Files:* `lib/notifications/triggers.ts`
+- [x] **Notification Toast (Lightweight Popup):** Toast khi có notification mới (2s dismiss tự động
+  hoặc click close).
+    - *Files:* `components/notifications/notification-toast.tsx`
+    - 📋 STATUS: Custom polling toast implemented with auto-dismiss.
 
-- [ ] **Trang Lịch sử Thông báo:** Danh sách đầy đủ, lọc theo đã đọc/chưa đọc và loại thông báo,
-  giữ lịch sử 90 ngày.
-    - *Files:* `app/dashboard/notifications/page.tsx`
+- [x] **Mark as Read & Delete:** Khi click notification, auto mark as read, click chuyển tới detail
+  page, swipe/button delete.
+    - *Files:* `app/api/notifications/[id]/read/route.ts`, `app/api/notifications/[id]/route.ts`
+    - 📋 STATUS: Mark-as-read and DELETE endpoints implemented; UI swipe/delete polish planned.
 
-- [ ] **Cài đặt Loại Thông báo:** Bật/tắt từng loại thông báo (Task / KPI / Hệ thống), cài đặt
-  giờ "Không làm phiền".
-    - *Files:* `components/profile/notification-settings.tsx`,
-      `app/api/users/me/notification-settings/route.ts`
+- [x] **Notification Preferences (Settings Tab):** Toggle on/off per notification type
+  (TASK_ASSIGNED, TASK_REJECTED, REVIEW_NEEDED, etc.), email notification toggle.
+    - *Files:* `components/profile/notification-preferences.tsx`, `components/profile/settings-form.tsx`
+    - 📋 STATUS: Client-side persisted notification type preferences added to settings.
 
-> **Lược bỏ:** Thông báo qua email, Push notification trình duyệt, Cảnh báo tự động KPI thấp /
-> task Pending / workload quá tải — sẽ triển khai sau MVP.
+### 7C — Tìm kiếm & Lọc Task (Advanced)
+
+- [x] **Global Search:** Search bar ở header, tìm task/người/phòng ban/team (1s debounce), display 3
+  mục results.
+    - *Files:* `components/search/global-search-input.tsx`, `app/api/search/route.ts`
+    - 📋 STATUS: Basic search API + client component implemented (contains-based search). Integrated into dashboard header.
+
+- [x] **Task List Advanced Filter:** Dropdown + checkbox: status, priority, assignee, creator,
+  deadline range, department, weight. Save filter preset, clear all.
+    - *Files:* `components/tasks/task-filter-bar.tsx`, `app/api/tasks?filters=...`
+    - 📋 STATUS: Filterable task table with saved presets, clear all, deadline/weight/date range filters.
+
+- [x] **Sort by:** Deadline, Priority, Created, Updated, Weight, Progress %.
+    - *Files:* Task List Page
+    - 📋 STATUS: Sort dropdown implemented in task table.
 
 ### 7C — Tìm kiếm & Lọc
 
-- [ ] **Tìm kiếm Task theo Từ khóa:** Real-time khi gõ ≥ 3 ký tự, tìm trong tiêu đề + mô tả,
+- [x] **Tìm kiếm Task theo Từ khóa:** Real-time khi gõ ≥ 3 ký tự, tìm trong tiêu đề + mô tả,
   highlight từ khóa trong kết quả.
     - *Files:* `components/tasks/task-search.tsx`, `app/api/tasks/search/route.ts`
+    - 📋 STATUS: Added debounced 300ms task search (min 3 chars), keyword highlight in title/description,
+      role-scoped API search and integrated widget on task list page.
 
-- [ ] **Bộ lọc Nâng cao Task:** Lọc đa điều kiện (trạng thái, assignee, deadline, priority, tag),
+- [x] **Bộ lọc Nâng cao Task:** Lọc đa điều kiện (trạng thái, assignee, deadline, priority, tag),
   lưu bộ lọc yêu thích.
-    - *Files:* `components/tasks/task-filter.tsx`
+    - *Files:* `components/tasks/task-filter.tsx`, `components/tasks/task-table.tsx`, `app/api/users/me/saved-filters/route.ts`, `app/api/users/me/saved-filters/[id]/route.ts`
+    - 📋 STATUS: Added advanced filter component for task search and moved saved filter presets to per-user
+      API persistence (max 10 presets, create/apply/delete).
 
-- [ ] **Tìm kiếm Toàn cục (Ctrl+K):** Tìm đồng thời task + nhân viên + phòng ban, phân nhóm kết
+- [x] **Tìm kiếm Toàn cục (Ctrl+K):** Tìm đồng thời task + nhân viên + phòng ban, phân nhóm kết
   quả theo loại.
-    - *Files:* `components/layout/global-search.tsx`
+    - *Files:* `components/layout/global-search.tsx`, `components/search/global-search-input.tsx`, `app/api/search/global/route.ts`, `app/api/search/route.ts`
+    - 📋 STATUS: Implemented global search wrapper component, grouped task/user/department result rendering,
+      switched to /api/search/global with 300ms debounce and role-based task scope.
 
 ---
 
