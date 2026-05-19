@@ -393,26 +393,41 @@ Mỗi task được thiết kế để hoàn thành trong **tối đa 2 giờ**.
 
 ---
 
-## Milestone 8: Báo cáo (F7)
+## Milestone 8: Báo cáo (F6)
 *Mục tiêu: Báo cáo tháng/quý cho Trưởng phòng và BGĐ, export Excel.*
 
-- [ ] **Báo cáo Tháng — Trưởng phòng:** Tóm tắt tổng task / hoàn thành / trễ hạn, KPI trung bình
+- [x] **Báo cáo Tháng — Trưởng phòng:** Tóm tắt tổng task / hoàn thành / trễ hạn, KPI trung bình
   phòng và từng nhân viên, so sánh với tháng trước, highlight xuất sắc và cần cải thiện.
     - *Files:* `app/dashboard/reports/monthly/page.tsx`, `components/reports/monthly-report.tsx`,
       `app/api/reports/monthly/route.ts`
+    - ✅ Completed: API route có phân trang server-side, UI có empty/error state + summary cards + so sánh tháng trước, banner KPI chưa tính và export disable theo spec.
 
-- [ ] **Báo cáo KPI Toàn công ty — BGĐ:** KPI trung bình từng phòng, xếp hạng phòng, biểu đồ so
+- [x] **Báo cáo KPI Toàn công ty — BGĐ:** KPI trung bình từng phòng, xếp hạng phòng, biểu đồ so
   sánh, Top 5 nhân viên xuất sắc, tỷ lệ hoàn thành đúng hạn.
     - *Files:* `app/dashboard/reports/company/page.tsx`, `components/reports/company-kpi-report.tsx`,
       `app/api/reports/company-kpi/route.ts`
+    - ✅ Completed: API route đã có RBAC, UI có xếp hạng phòng + Top 5 nhân viên + tỷ lệ đúng hạn, kèm biểu đồ so sánh cơ bản.
 
-- [ ] **Báo cáo Tiến độ Task theo Tuần:** Task Done / In Progress / Pending theo tuần, tỷ lệ hoàn
+- [x] **Báo cáo Tiến độ Task theo Tuần:** Task Done / In Progress / Pending theo tuần, tỷ lệ hoàn
   thành đúng hạn, so sánh tuần trước.
-    - *Files:* `components/reports/weekly-progress-report.tsx`, `app/api/reports/weekly/route.ts`
+    - *Files:* `components/reports/weekly-progress-report.tsx`, `app/api/reports/weekly/route.ts`, `app/dashboard/reports/weekly/page.tsx`
+    - ✅ Completed: API route + UI trang tuần đã có, hiển thị trạng thái, tỷ lệ đúng hạn và so sánh tuần trước theo snapshot dữ liệu hiện tại.
 
-- [ ] **Export Báo cáo ra Excel:** Nút export trên trang báo cáo, xuất theo bộ lọc hiện tại,
+- [x] **Export Báo cáo ra Excel:** Nút export trên trang báo cáo, xuất theo bộ lọc hiện tại,
   format bảng với header, tên file tự động theo tháng/phòng.
     - *Files:* `lib/export/excel-report.ts`, `app/api/reports/export/route.ts`
+    - ✅ Completed: XLSX export theo batch/paged queries, có CSV fallback và chặn >10.000 dòng.
+
+- **Status:** Completed — Milestone 8 đã hoàn tất theo phạm vi MVP.
+  
+- **Progress Details (2026-05-20):**
+  - Scaffolded API routes: `app/api/reports/monthly`, `weekly`, `company-kpi`, `export`
+  - Added reporting helper: `lib/reports/index.ts` (monthly, paginated monthly, company KPI, weekly)
+  - Added export util: `lib/export/excel-report.ts` and XLSX generator `lib/export/xlsx-report.ts`
+  - Export route uses paged queries + ExcelJS workbook generation and enforces 10k row limit
+  - RBAC: manager department scope and company-level role checks are wired on report routes
+  - Added report UI shells: monthly, company, weekly pages/components with empty/error states and comparison visuals
+  - KPI-tháng-chưa-tính banner + export disable wired in monthly report UI
 
 > **Lược bỏ:** Phân tích nguyên nhân task trễ, Workload balancing, Báo cáo so sánh cùng kỳ
 > năm ngoái, Báo cáo tự động gửi email, Cấu hình hệ thống (ngưỡng KPI, mức phạt, chu kỳ tính),
