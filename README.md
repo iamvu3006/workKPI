@@ -1,42 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# WorkKPI
 
-## Project Docs
+WorkKPI la he thong quan tri cong viec va do luong KPI noi bo cho doanh nghiep, duoc xay dung de thay the quy trinh theo doi thu cong bang bang tinh.
 
-The durable project context lives in [docs/README.md](docs/README.md).
+Muc tieu cua du an:
 
-Start there if you need product scope, architecture, decisions, testing guidance, or the current sprint plan.
+- Quan ly cong viec tap trung theo phong ban/nhan su.
+- Theo doi KPI minh bach, co kha nang mo rong.
+- Dam bao bao mat, kiem soat phan quyen, va de bao tri.
 
-## Getting Started
+## Tai lieu du an
 
-First, run the development server:
+Nguon tai lieu chinh cua du an nam tai [docs/README.md](docs/README.md).
+
+Nen doc theo thu tu:
+
+1. [docs/PRD.md](docs/PRD.md)
+2. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+3. [docs/testing.md](docs/testing.md)
+4. [docs/TASKS.md](docs/TASKS.md)
+
+## Cong nghe su dung
+
+- Next.js App Router
+- TypeScript (strict)
+- Tailwind CSS + shadcn/ui + Radix UI
+- Supabase (Auth + Database integration)
+- Prisma ORM (PostgreSQL)
+- Vitest + Testing Library
+
+## Cau truc thu muc chinh
+
+```text
+app/            # Pages, layouts, route handlers
+components/     # UI components va feature components
+lib/            # Domain logic, service, helpers
+utils/          # Shared utilities (bao gom supabase client/server)
+prisma/         # Prisma schema, migrations, SQL scripts
+docs/           # PRD, architecture, testing, sprint plan
+__tests__/      # Unit/integration tests
+```
+
+## Yeu cau moi truong
+
+- Node.js 20+
+- npm 10+ (hoac yarn/pnpm neu doi ban can)
+- PostgreSQL (co the dung Supabase)
+
+## Cai dat du an
+
+1. Cai dependencies:
+
+```bash
+npm install
+```
+
+2. Tao file `.env.local` tai root du an va cau hinh cac bien toi thieu:
+
+```bash
+DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<db>?schema=public"
+NEXT_PUBLIC_SUPABASE_URL="https://<project-ref>.supabase.co"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="<your-supabase-anon-or-publishable-key>"
+```
+
+3. (Khuyen nghi) Dong bo Prisma client:
+
+```bash
+npx prisma generate
+```
+
+## Chay chuong trinh o local
+
+Chay development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mo trinh duyet tai dia chi [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Cac lenh script quan trong
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev      # Chay moi truong phat trien
+npm run build    # Build production
+npm run start    # Chay ban build production
+npm run lint     # Kiem tra lint
+npm run test     # Chay test bang Vitest
+npm run test:ui  # Chay Vitest UI
+```
 
-## Learn More
+## Quy uoc phat trien
 
-To learn more about Next.js, take a look at the following resources:
+- Uu tien Server Components, chi dung client component khi can tuong tac.
+- Moi API route can tra response format thong nhat (`success`, `data`/`error`, `code`).
+- Tat ca thao tac DB/Auth can duoc validate va kiem soat quyen o phia server.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Ghi chu
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Neu can boi canh san pham va lo trinh sprint, tham khao [docs/README.md](docs/README.md).
+- Neu can boi canh auth va bao mat, uu tien doc [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) va cac test trong [__tests__/auth](__tests__/auth).
