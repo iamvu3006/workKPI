@@ -46,6 +46,18 @@ __tests__/      # Unit/integration tests
 - npm 10+ (hoac yarn/pnpm neu doi ban can)
 - PostgreSQL (co the dung Supabase)
 
+## Bien moi truong can co
+
+De chay demo day du (bao gom tao Supabase Auth users), can them:
+
+```bash
+DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<db>?schema=public"
+SUPABASE_URL="https://<project-ref>.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"
+```
+
+Neu da co `NEXT_PUBLIC_SUPABASE_URL` thi script seed cung se dung duoc gia tri nay thay cho `SUPABASE_URL`.
+
 ## Cai dat du an
 
 1. Cai dependencies:
@@ -67,6 +79,14 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="<your-supabase-anon-or-publishable-key>"
 ```bash
 npx prisma generate
 ```
+
+4. Tao du lieu demo cho database:
+
+```bash
+npm run seed
+```
+
+Script nay tao lai cac bang demo, profile theo role, task/KPI/notification/session mau va tao 11 tai khoan Supabase Auth khop voi email trong `profiles`.
 
 ## Chay chuong trinh o local
 
