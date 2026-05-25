@@ -30,6 +30,8 @@ export function ReviewForm({
   const [showReject, setShowReject] = useState(false);
   const [loading, setLoading] = useState(false);
   const [penaltyInfo, setPenaltyInfo] = useState<Record<string, unknown> | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Calculate penalty on score/deadline change
   const calculatePenalty = useCallback(async () => {
@@ -67,17 +69,17 @@ export function ReviewForm({
     const json = await res.json();
     setLoading(false);
     if (json.success) {
-      setOpen(false);
+      setSuccessMsg("Duyệt thành công!");
       onSuccess?.();
-      alert("Duyệt thành công!");
+      setErrorMsg(null);
     } else {
-      alert(json.error || "Lỗi khi duyệt");
+      setErrorMsg(json.error || "Lỗi khi duyệt");
     }
   };
 
   const reject = async () => {
     if (rejectReason.length < MIN_REVIEW_REJECT_REASON_LENGTH) {
-      alert(`Lý do cần ít nhất ${MIN_REVIEW_REJECT_REASON_LENGTH} ký tự`);
+      setErrorMsg(`Lý do cần ít nhất ${MIN_REVIEW_REJECT_REASON_LENGTH} ký tự`);
       return;
     }
     setLoading(true);
@@ -92,11 +94,11 @@ export function ReviewForm({
     const json = await res.json();
     setLoading(false);
     if (json.success) {
-      setOpen(false);
+      setSuccessMsg("Đã trả lại task");
       onSuccess?.();
-      alert("Đã trả lại task");
+      setErrorMsg(null);
     } else {
-      alert(json.error || "Lỗi khi trả lại");
+      setErrorMsg(json.error || "Lỗi khi trả lại");
     }
   };
 
@@ -115,6 +117,13 @@ export function ReviewForm({
         <p className="mt-2 text-sm text-slate-600">Task: {taskTitle}</p>
         <p className="text-xs text-slate-500">Deadline: {new Date(deadline).toLocaleDateString("vi-VN")}</p>
 
+        {successMsg && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-700">{successMsg}</div>
+        )}
+        {errorMsg && (
+          <div className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{errorMsg}</div>
+        )}
+
         {/* Self-assessment display */}
         {selfAssessment && (
           <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
@@ -130,9 +139,9 @@ export function ReviewForm({
 
         {/* Penalty info */}
         {penaltyInfo && (
-          <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-            <p className="text-xs font-semibold text-yellow-800">Tính toán phạt Overdue:</p>
-            <div className="mt-2 space-y-1 text-xs text-yellow-700">
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+            <p className="text-xs font-semibold text-amber-700">Tính toán phạt Overdue:</p>
+            <div className="mt-2 space-y-1 text-xs text-amber-700">
               <p>Số ngày trễ: {(penaltyInfo as any).penaltyDays} ngày</p>
               <p>Điểm gốc: {(penaltyInfo as any).qualityScoreRaw}</p>
               <p className="font-semibold">Điểm sau phạt: {(penaltyInfo as any).qualityScoreAfterPenalty}</p>

@@ -24,30 +24,30 @@ async function UsersList() {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="border-b bg-gray-50">
-          <tr>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Email</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Full Name</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Role</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Department</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Status</th>
-            <th className="px-4 py-2 text-right text-sm font-semibold">Actions</th>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 bg-slate-50/60">
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Email</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Full Name</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Role</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Department</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Status</th>
+            <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-100">
           {users.map((user) => (
-            <tr key={user.id} className="border-b hover:bg-gray-50">
-              <td className="px-4 py-3 text-sm">{user.email}</td>
-              <td className="px-4 py-3 text-sm">{user.fullName}</td>
-              <td className="px-4 py-3 text-sm">{user.role}</td>
-              <td className="px-4 py-3 text-sm">{user.department?.name || "—"}</td>
+            <tr key={user.id} className="border-b border-slate-100 transition-colors hover:bg-slate-50/60">
+              <td className="px-4 py-3 text-sm text-slate-700">{user.email}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{user.fullName}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{user.role}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{user.department?.name || "—"}</td>
               <td className="px-4 py-3 text-sm">
                 <span
-                  className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
+                  className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
                     user.status === "ACTIVE"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : "bg-rose-50 text-rose-700 border border-rose-200"
                   }`}
                 >
                   {user.status}
@@ -56,9 +56,9 @@ async function UsersList() {
               <td className="px-4 py-3 text-right text-sm">
                 <Link
                   href={`/admin/users/${user.id}`}
-                  className="text-blue-600 hover:underline"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
                 >
-                  Edit
+                  Chỉnh sửa
                 </Link>
               </td>
             </tr>
@@ -73,14 +73,23 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Quản lý Người dùng</h2>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Quản trị</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Người dùng</h1>
+        </div>
         <Link href="/admin/users/new">
-          <Button>+ Thêm người dùng</Button>
+          <Button className="gap-2">+ Thêm người dùng</Button>
         </Link>
       </div>
 
       <Card className="p-6">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center py-12">
+              <div className="text-sm text-slate-500">Đang tải...</div>
+            </div>
+          }
+        >
           <UsersList />
         </Suspense>
       </Card>

@@ -80,19 +80,14 @@ export default async function KpiDepartmentPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8">
       <div className="mx-auto max-w-5xl">
-        <div className="flex items-center justify-between">
+        <header className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">KPI Phòng ban</h1>
-            <p className="mt-2 text-slate-600">{departmentName}</p>
+            <p className="text-xs font-medium uppercase tracking-wide text-teal-700">KPI</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">KPI Phòng ban — {departmentName}</h1>
+            <p className="mt-1 text-sm text-slate-500">Tháng {currentMonth} / {currentYear}</p>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/dashboard">← Quay lại</Link>
-          </Button>
-        </div>
-
-        <p className="mt-4 text-sm text-slate-600">
-          Tháng {currentMonth} / {currentYear}
-        </p>
+          <Button asChild variant="outline"><Link href="/dashboard">← Quay lại</Link></Button>
+        </header>
 
         {error && (
           <Card className="mt-6 border-red-200 bg-red-50 p-4">
@@ -115,30 +110,30 @@ export default async function KpiDepartmentPage() {
             <Card className="border-slate-200 bg-white p-6">
               <h2 className="text-lg font-semibold text-slate-900">Tóm tắt Phòng ban</h2>
               <div className="mt-6 grid grid-cols-3 gap-4">
-                <div className="rounded-lg bg-slate-50 p-4 text-center">
-                  <p className="text-xs font-medium uppercase text-slate-600">Nhân viên</p>
-                  <p className="mt-2 text-3xl font-bold text-slate-900">{departmentData.length}</p>
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Nhân viên</p>
+                    <p className="mt-2 text-3xl font-bold text-slate-900">{departmentData.length}</p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Điểm TB</p>
+                    <p className="mt-2 text-3xl font-bold text-slate-900">
+                      {(
+                        departmentData.reduce((sum: number, row: any) => sum + row.totalScore, 0) /
+                        departmentData.length
+                      ).toFixed(1)}
+                    </p>
+                  </div>
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+                    <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Đúng hạn TB</p>
+                    <p className="mt-2 text-3xl font-bold text-slate-900">
+                      {(
+                        departmentData.reduce((sum: number, row: any) => sum + row.onTimeRate, 0) /
+                        departmentData.length
+                      ).toFixed(0)}
+                    %
+                    </p>
+                  </div>
                 </div>
-                <div className="rounded-lg bg-slate-50 p-4 text-center">
-                  <p className="text-xs font-medium uppercase text-slate-600">Điểm TB</p>
-                  <p className="mt-2 text-3xl font-bold text-slate-900">
-                    {(
-                      departmentData.reduce((sum: number, row: any) => sum + row.totalScore, 0) /
-                      departmentData.length
-                    ).toFixed(1)}
-                  </p>
-                </div>
-                <div className="rounded-lg bg-slate-50 p-4 text-center">
-                  <p className="text-xs font-medium uppercase text-slate-600">Đúng hạn TB</p>
-                  <p className="mt-2 text-3xl font-bold text-slate-900">
-                    {(
-                      departmentData.reduce((sum: number, row: any) => sum + row.onTimeRate, 0) /
-                      departmentData.length
-                    ).toFixed(0)}
-                  %
-                  </p>
-                </div>
-              </div>
             </Card>
 
             {/* Department ranking table */}
@@ -158,11 +153,11 @@ export default async function KpiDepartmentPage() {
               <h2 className="text-lg font-semibold text-slate-900">Phân bố Xếp loại</h2>
               <div className="mt-6 space-y-3">
                 {[
-                  { grade: "EXCELLENT", label: "Xuất sắc", color: "bg-green-100" },
-                  { grade: "GOOD", label: "Tốt", color: "bg-blue-100" },
-                  { grade: "PASS", label: "Đạt", color: "bg-yellow-100" },
-                  { grade: "NEEDS_IMPROVEMENT", label: "Cần cải thiện", color: "bg-red-100" },
-                ].map(({ grade, label, color }) => {
+                  { grade: "EXCELLENT", label: "Xuất sắc", barClass: "bg-emerald-500" },
+                  { grade: "GOOD", label: "Tốt", barClass: "bg-teal-500" },
+                  { grade: "PASS", label: "Đạt", barClass: "bg-amber-400" },
+                  { grade: "NEEDS_IMPROVEMENT", label: "Cần cải thiện", barClass: "bg-rose-400" },
+                ].map(({ grade, label, barClass }) => {
                   const count = departmentData.filter((r: any) => r.grade === grade).length;
                   const percent = departmentData.length > 0 ? (count / departmentData.length) * 100 : 0;
 
@@ -170,12 +165,10 @@ export default async function KpiDepartmentPage() {
                     <div key={grade}>
                       <div className="flex items-center justify-between text-sm">
                         <span className="font-medium text-slate-700">{label}</span>
-                        <span className="text-slate-600">
-                          {count} ({percent.toFixed(0)}%)
-                        </span>
+                        <span className="text-slate-600">{count} ({percent.toFixed(0)}%)</span>
                       </div>
                       <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-200">
-                        <div className={`h-full ${color}`} style={{ width: `${percent}%` }} />
+                        <div className={`h-full rounded-full ${barClass} transition-all`} style={{ width: `${percent}%` }} />
                       </div>
                     </div>
                   );

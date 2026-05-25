@@ -17,7 +17,7 @@ interface KpiDepartmentTableProps {
 const GRADE_CONFIG = {
   EXCELLENT: { label: "Xuất sắc", color: "bg-green-100 text-green-800" },
   GOOD: { label: "Tốt", color: "bg-blue-100 text-blue-800" },
-  PASS: { label: "Đạt", color: "bg-yellow-100 text-yellow-800" },
+  PASS: { label: "Đạt", color: "bg-amber-100 text-amber-700" },
   NEEDS_IMPROVEMENT: { label: "Cần cải thiện", color: "bg-red-100 text-red-800" },
 };
 

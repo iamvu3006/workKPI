@@ -16,6 +16,10 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [pendingTaskId, setPendingTaskId] = useState<string | null>(null);
+  const [pendingReason, setPendingReason] = useState("");
+  const [pendingError, setPendingError] = useState<string | null>(null);
+  const [pendingLoading, setPendingLoading] = useState(false);
 
   const loadTasks = useCallback(async () => {
     setLoading(true);
@@ -47,19 +51,16 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
       return;
     }
 
-    let reason: string | undefined;
     if (status === "PENDING") {
-      reason = window.prompt("Nhập lý do vướng mắc:") ?? undefined;
-      if (!reason || reason.length < 10) {
-        setDraggingId(null);
-        return;
-      }
+      setPendingTaskId(taskId);
+      setDraggingId(null);
+      return;
     }
 
     const res = await fetch(`/api/tasks/${taskId}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status, reason, pendingBlockType: "OTHER" }),
+      body: JSON.stringify({ status, pendingBlockType: "OTHER" }),
     });
     const json = await res.json();
     if (json.success) {
@@ -67,7 +68,9 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
         prev.map((t) => (t.id === taskId ? { ...t, status: json.data.status } : t))
       );
     } else {
-      alert(json.error || "Không thể đổi trạng thái");
+      // show inline error near board
+      setPendingError(json.error || "Không thể đổi trạng thái");
+      setTimeout(() => setPendingError(null), 4000);
     }
     setDraggingId(null);
   };
@@ -134,6 +137,58 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {pendingTaskId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
+            <h3 className="text-base font-semibold text-slate-900">Báo Pending</h3>
+            <p className="mt-1 text-sm text-slate-500">Mô tả lý do vướng mắc (tối thiểu 10 ký tự)</p>
+            {pendingError && (
+              <div className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">{pendingError}</div>
+            )}
+            <textarea
+              value={pendingReason}
+              onChange={(e) => setPendingReason(e.target.value)}
+              className="mt-3 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+              rows={3}
+              placeholder="Ví dụ: Đang chờ phản hồi từ khách hàng..."
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => { setPendingTaskId(null); setPendingReason(""); setPendingError(null); }}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100"
+              >
+                Hủy
+              </button>
+              <button
+                disabled={pendingReason.trim().length < 10 || pendingLoading}
+                onClick={async () => {
+                  if (!pendingTaskId) return;
+                  setPendingLoading(true);
+                  const res = await fetch(`/api/tasks/${pendingTaskId}/status`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ status: "PENDING", reason: pendingReason, pendingBlockType: "OTHER" }),
+                  });
+                  const json = await res.json();
+                  setPendingLoading(false);
+                  if (json.success) {
+                    setTasks((prev) => prev.map((t) => (t.id === pendingTaskId ? { ...t, status: json.data.status } : t)));
+                    setPendingTaskId(null);
+                    setPendingReason("");
+                    setPendingError(null);
+                  } else {
+                    setPendingError(json.error || "Không thể đổi trạng thái");
+                  }
+                }}
+                className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-40"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

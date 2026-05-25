@@ -215,7 +215,7 @@ export default async function ProfilePage() {
             <CardContent className="pt-6">
               <div className="space-y-2">
                 <p className="text-sm font-medium text-slate-600">Tỷ lệ thành công</p>
-                <p className="text-3xl font-semibold text-blue-600">{kpiStats.successRate}</p>
+                <p className="text-3xl font-semibold text-teal-600">{kpiStats.successRate}</p>
               </div>
             </CardContent>
           </Card>

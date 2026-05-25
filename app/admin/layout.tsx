@@ -1,6 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db/prisma";
 
@@ -35,38 +36,40 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Admin Header */}
-      <header className="border-b bg-white">
-        <div className="flex items-center justify-between px-6 py-4">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="flex items-center gap-4 px-6 py-4">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">A</div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-sm text-gray-500">{profile?.email}</p>
+            <h1 className="text-sm font-semibold text-slate-900">Admin — WorkKPI</h1>
+            <p className="text-xs text-slate-500">{profile?.email}</p>
           </div>
         </div>
       </header>
 
       <div className="flex">
         {/* Admin Sidebar */}
-        <aside className="w-64 border-r bg-white">
-          <nav className="space-y-1 p-4">
-            <a
-              href="/admin/users"
-              className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-            >
-              Quản lý Người dùng
-            </a>
-            <a
-              href="/admin/departments"
-              className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-            >
-              Quản lý Phòng ban
-            </a>
+        <aside className="w-56 shrink-0 border-r border-slate-200 bg-white">
+          <nav className="space-y-1 p-3">
+            {[
+              { href: "/admin/users", label: "Người dùng", icon: "👥" },
+              { href: "/admin/departments", label: "Phòng ban", icon: "🏢" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              >
+                <span>{item.icon}</span>
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 overflow-auto bg-slate-50 p-6">{children}</main>
       </div>
     </div>
   );

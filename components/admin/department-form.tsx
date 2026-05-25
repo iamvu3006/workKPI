@@ -101,7 +101,7 @@ export function DepartmentForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Department Name *
           </label>
           <Input
@@ -116,7 +116,7 @@ export function DepartmentForm({
 
         {/* Code */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Department Code *
           </label>
           <Input
@@ -129,7 +129,7 @@ export function DepartmentForm({
             className="mt-1"
           />
           {isEdit && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-slate-500">
               Department code cannot be changed
             </p>
           )}
@@ -137,7 +137,7 @@ export function DepartmentForm({
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Description
           </label>
           <textarea
@@ -146,20 +146,20 @@ export function DepartmentForm({
             onChange={handleChange}
             placeholder="Department description (optional)"
             rows={3}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2"
           />
         </div>
 
         {/* Manager */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Department Manager (Trưởng phòng) *
           </label>
           <select
             name="managerId"
             value={formData.managerId}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2"
           >
             <option value="">Select a manager</option>
             {managers.map((manager) => (

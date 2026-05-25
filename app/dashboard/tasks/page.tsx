@@ -59,7 +59,8 @@ export default async function TasksKanbanPage() {
           </nav>
         </header>
 
-        <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-4">
+        <div className="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm max-w-md">
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Trọng số tháng của bạn</p>
           <WeightProgressBar total={weightTotal} />
         </div>
 

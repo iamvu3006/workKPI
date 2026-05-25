@@ -35,9 +35,13 @@ export default async function TaskDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8">
       <div className="mx-auto max-w-3xl">
-        <Link href="/dashboard/tasks" className="text-sm text-teal-700 hover:underline">
-          ← Kanban
-        </Link>
+        <nav className="flex items-center gap-2 text-sm text-slate-500">
+          <Link href="/dashboard" className="hover:text-slate-900">Dashboard</Link>
+          <span>/</span>
+          <Link href="/dashboard/tasks" className="hover:text-slate-900">Tasks</Link>
+          <span>/</span>
+          <span className="text-slate-900">Chi tiết</span>
+        </nav>
         <div className="mt-4">
           <TaskDetail taskId={id} currentUserId={profile.id} canEdit={canEdit} />
         </div>

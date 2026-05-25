@@ -70,9 +70,13 @@ export default async function TasksListPage() {
             <p className="text-sm font-medium uppercase tracking-wider text-teal-700">Tasks</p>
             <h1 className="text-2xl font-semibold text-slate-900">Danh sách phòng</h1>
           </div>
-          <Link href="/dashboard/tasks" className="text-sm text-teal-700 hover:underline">
-            ← Kanban
-          </Link>
+          <nav className="flex items-center gap-2 text-sm text-slate-500">
+            <Link href="/dashboard" className="hover:text-slate-900">Dashboard</Link>
+            <span>/</span>
+            <Link href="/dashboard/tasks" className="hover:text-slate-900">Tasks</Link>
+            <span>/</span>
+            <span className="text-slate-900">Danh sách</span>
+          </nav>
         </header>
         <TaskSearch />
         <TaskTable

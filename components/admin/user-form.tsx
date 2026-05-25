@@ -96,7 +96,7 @@ export function UserForm({ user, departments, onSuccess }: UserFormProps) {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Email */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Email *
           </label>
           <Input
@@ -109,7 +109,7 @@ export function UserForm({ user, departments, onSuccess }: UserFormProps) {
             className="mt-1"
           />
           {isEdit && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-slate-500">
               Email cannot be changed
             </p>
           )}
@@ -117,7 +117,7 @@ export function UserForm({ user, departments, onSuccess }: UserFormProps) {
 
         {/* Full Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Full Name *
           </label>
           <Input
@@ -132,14 +132,14 @@ export function UserForm({ user, departments, onSuccess }: UserFormProps) {
 
         {/* Department */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Department *
           </label>
           <select
             name="departmentId"
             value={formData.departmentId}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2"
           >
             <option value="">Select a department</option>
             {departments.map((dept) => (
@@ -152,14 +152,14 @@ export function UserForm({ user, departments, onSuccess }: UserFormProps) {
 
         {/* Role */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-slate-900">
             Role *
           </label>
           <select
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="mt-1 block w-full rounded-lg border border-slate-200 px-3 py-2"
           >
             <option value="EMPLOYEE">Employee</option>
             <option value="LEADER">Leader</option>

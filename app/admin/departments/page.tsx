@@ -29,31 +29,31 @@ async function DepartmentsList() {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="border-b bg-gray-50">
-          <tr>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Name</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Code</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Manager</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Members</th>
-            <th className="px-4 py-2 text-left text-sm font-semibold">Teams</th>
-            <th className="px-4 py-2 text-right text-sm font-semibold">Actions</th>
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-slate-200 bg-slate-50/60">
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Name</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Code</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Manager</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Members</th>
+            <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Teams</th>
+            <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-slate-100">
           {departments.map((dept) => (
-            <tr key={dept.id} className="border-b hover:bg-gray-50">
-              <td className="px-4 py-3 text-sm font-medium">{dept.name}</td>
-              <td className="px-4 py-3 text-sm">{dept.code}</td>
-              <td className="px-4 py-3 text-sm">{dept.manager?.fullName || "—"}</td>
-              <td className="px-4 py-3 text-sm">{dept._count.members}</td>
-              <td className="px-4 py-3 text-sm">{dept._count.teams}</td>
+            <tr key={dept.id} className="border-b border-slate-100 transition-colors hover:bg-slate-50/60">
+              <td className="px-4 py-3 text-sm font-medium text-slate-900">{dept.name}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{dept.code}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{dept.manager?.fullName || "—"}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{dept._count.members}</td>
+              <td className="px-4 py-3 text-sm text-slate-700">{dept._count.teams}</td>
               <td className="px-4 py-3 text-right text-sm">
                 <Link
                   href={`/admin/departments/${dept.id}`}
-                  className="text-blue-600 hover:underline"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:border-slate-300 hover:bg-slate-50"
                 >
-                  Edit
+                  Chỉnh sửa
                 </Link>
               </td>
             </tr>
@@ -68,14 +68,25 @@ export default function AdminDepartmentsPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-bold">Quản lý Phòng ban</h2>
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Quản trị</p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Phòng ban</h1>
+        </div>
         <Link href="/admin/departments/new">
-          <Button>+ Thêm phòng ban</Button>
+          <Button className="gap-2"> 
+            <span>+</span> Thêm phòng ban
+          </Button>
         </Link>
       </div>
 
       <Card className="p-6">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center py-12">
+              <div className="text-sm text-slate-500">Đang tải...</div>
+            </div>
+          }
+        >
           <DepartmentsList />
         </Suspense>
       </Card>

@@ -10,7 +10,7 @@ interface KpiPersonalCardProps {
 const GRADE_CONFIG = {
   EXCELLENT: { label: "Xuất sắc", color: "bg-green-100 text-green-800", score: "≥ 90" },
   GOOD: { label: "Tốt", color: "bg-blue-100 text-blue-800", score: "75–89" },
-  PASS: { label: "Đạt", color: "bg-yellow-100 text-yellow-800", score: "65–74" },
+  PASS: { label: "Đạt", color: "bg-amber-100 text-amber-700", score: "65–74" },
   NEEDS_IMPROVEMENT: { label: "Cần cải thiện", color: "bg-red-100 text-red-800", score: "< 65" },
 };
 
@@ -60,7 +60,7 @@ export function KpiPersonalCard({ totalScore, grade, onTimeRate }: KpiPersonalCa
                 : totalScore >= 75
                   ? "bg-blue-500"
                   : totalScore >= 65
-                    ? "bg-yellow-500"
+                    ? "bg-amber-500"
                     : "bg-red-500"
             }`}
             style={{ width: `${Math.min(totalScore, 100)}%` }}

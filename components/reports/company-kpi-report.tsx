@@ -3,79 +3,100 @@ import React from "react";
 export default function CompanyKpiComponent({ data, error }: { data: any; error?: string | null }) {
   if (error) {
     return (
-      <section>
-        <h1>Báo cáo KPI Toàn công ty</h1>
-        <div>{error}</div>
+      <section className="space-y-4">
+        <h2 className="text-base font-semibold text-slate-900">Báo cáo KPI Toàn công ty</h2>
+        <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+          <p className="text-sm text-rose-700">{error}</p>
+        </div>
       </section>
     );
   }
 
   if (!data) {
     return (
-      <section>
-        <h1>Báo cáo KPI Toàn công ty</h1>
-        <div>Chưa có dữ liệu cho tháng này.</div>
+      <section className="space-y-4">
+        <h2 className="text-base font-semibold text-slate-900">Báo cáo KPI Toàn công ty</h2>
+        <div className="rounded-xl border border-dashed border-slate-300 bg-white py-12 text-center">
+          <p className="text-sm text-slate-500">Chưa có dữ liệu cho tháng này.</p>
+        </div>
       </section>
     );
   }
 
   const departments = Array.isArray(data.departments) ? data.departments : [];
   const topPerformers = Array.isArray(data.topPerformers) ? data.topPerformers : [];
-  return (
-    <section>
-      <h1>Báo cáo KPI Toàn công ty</h1>
-      <p>Tháng {data.month}/{data.year}</p>
-      <p>Tỷ lệ đúng hạn toàn công ty: {data.onTimeRate ?? 0}%</p>
 
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", margin: "16px 0" }}>
-        <div>Phòng ban: {departments.length}</div>
-        <div>Top 5 nhân viên: {topPerformers.length}</div>
+  return (
+    <section className="space-y-6">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm text-slate-600">Tháng {data.month}/{data.year}</p>
+          <p className="mt-1 text-sm text-slate-600">Tỷ lệ đúng hạn toàn công ty: {data.onTimeRate ?? 0}%</p>
+        </div>
       </div>
 
-      <div style={{ margin: "16px 0" }}>
-        <h3>Biểu đồ so sánh KPI theo phòng ban</h3>
-        <div style={{ display: "grid", gap: 8 }}>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Phòng ban</p>
+          <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{departments.length}</p>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Top 5 nhân viên</p>
+          <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{topPerformers.length}</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-base font-semibold text-slate-900">Biểu đồ so sánh KPI theo phòng ban</h3>
+        <div className="space-y-3">
           {departments.slice(0, 8).map((d: any) => (
-            <div key={d.department_id} style={{ display: "grid", gridTemplateColumns: "180px 1fr 70px", gap: 8, alignItems: "center" }}>
-              <span>{d.department_name}</span>
-              <div style={{ background: "#eee", height: 10, borderRadius: 999 }}>
-                <div style={{ width: `${Math.min(100, Number(d.avg_score ?? 0) * 10)}%`, height: "100%", background: "#16a34a", borderRadius: 999 }} />
+            <div key={d.department_id} className="flex items-center gap-3">
+              <span className="w-40 shrink-0 truncate text-sm text-slate-600">{d.department_name}</span>
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all"
+                  style={{ width: `${Math.min(100, Number(d.avg_score ?? 0) * 10)}%` }}
+                />
               </div>
-              <span>{Number(d.avg_score ?? 0).toFixed(2)}</span>
+              <span className="w-12 text-right text-sm font-semibold tabular-nums text-slate-900">{Number(d.avg_score ?? 0).toFixed(2)}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Xếp hạng</th>
-            <th>Phòng ban</th>
-            <th>Điểm trung bình</th>
-            <th>Số nhân sự</th>
-          </tr>
-        </thead>
-        <tbody>
-          {departments.length ? departments.map((d: any) => (
-            <tr key={d.department_id}>
-              <td>{d.rank}</td>
-              <td>{d.department_name}</td>
-              <td>{Number(d.avg_score).toFixed(2)}</td>
-              <td>{d.member_count}</td>
+      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 bg-slate-50/60">
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Xếp hạng</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Phòng ban</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Điểm trung bình</th>
+              <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Số nhân sự</th>
             </tr>
-          )) : (
-            <tr><td colSpan={4}>Chưa có dữ liệu cho tháng này.</td></tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {departments.length ? departments.map((d: any) => (
+              <tr key={d.department_id} className="transition-colors hover:bg-slate-50/40">
+                <td className="px-4 py-3 text-slate-700">{d.rank}</td>
+                <td className="px-4 py-3 text-slate-700">{d.department_name}</td>
+                <td className="px-4 py-3 text-slate-700">{Number(d.avg_score).toFixed(2)}</td>
+                <td className="px-4 py-3 text-slate-700">{d.member_count}</td>
+              </tr>
+            )) : (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-sm text-slate-500">Chưa có dữ liệu cho tháng này.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
-      <div style={{ marginTop: 20 }}>
-        <h2>Top 5 nhân viên</h2>
-        <ol>
+      <div>
+        <h3 className="text-base font-semibold text-slate-900">Top 5 nhân viên</h3>
+        <ol className="mt-2 space-y-2">
           {topPerformers.map((item: any) => (
-            <li key={item.userId}>
-              {item.fullName ?? "N/A"} - {item.departmentName ?? "N/A"} - {item.totalScore.toFixed(2)}
+            <li key={item.userId} className="text-sm text-slate-700">
+              {item.fullName ?? "N/A"} — <span className="text-slate-500">{item.departmentName ?? "N/A"}</span> — <span className="font-semibold tabular-nums">{Number(item.totalScore ?? 0).toFixed(2)}</span>
             </li>
           ))}
         </ol>

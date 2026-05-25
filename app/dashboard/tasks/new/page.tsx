@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -28,6 +29,13 @@ export default async function NewTaskPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8">
       <div className="mx-auto max-w-3xl">
+        <nav className="flex items-center gap-2 text-sm text-slate-500 mb-4">
+          <Link href="/dashboard" className="hover:text-slate-900">Dashboard</Link>
+          <span>/</span>
+          <Link href="/dashboard/tasks" className="hover:text-slate-900">Tasks</Link>
+          <span>/</span>
+          <span className="text-slate-900">Tạo</span>
+        </nav>
         <h1 className="mb-6 text-2xl font-semibold text-slate-900">Tạo task mới</h1>
         <TaskForm
           mode="create"

@@ -9,7 +9,7 @@ export default async function CreateUserPage() {
 
   if (departments.length === 0) {
     return (
-      <div className="rounded-lg bg-yellow-50 p-4 text-sm text-yellow-800">
+      <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-700">
         <strong>Note:</strong> No departments exist. Please create a department
         first before adding users.
       </div>
@@ -20,7 +20,7 @@ export default async function CreateUserPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Create New User</h1>
-        <p className="text-gray-600">
+        <p className="text-slate-600">
           Add a new user to the system. A temporary password will be sent via
           email.
         </p>

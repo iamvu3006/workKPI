@@ -42,29 +42,25 @@ export default async function DepartmentDetailPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{department.name}</h1>
-        <p className="text-gray-600">{department.code}</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{department.name}</h1>
+        <p className="text-sm text-slate-500">{department.code}</p>
         {department.description && (
-          <p className="mt-1 text-sm text-gray-600">{department.description}</p>
+          <p className="mt-1 text-sm text-slate-600">{department.description}</p>
         )}
       </div>
 
       {/* Department Info Summary */}
-      <div className="grid grid-cols-3 gap-4 rounded-lg bg-white p-4 md:grid-cols-3">
-        <div>
-          <p className="text-sm text-gray-600">Manager</p>
-          <p className="font-semibold">
-            {department.manager?.fullName || "—"}
-          </p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Members</p>
-          <p className="font-semibold">{department._count.members}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Teams</p>
-          <p className="font-semibold">{department._count.teams}</p>
-        </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        {[
+          { label: "Manager", value: department.manager?.fullName || "—" },
+          { label: "Members", value: String(department._count.members) },
+          { label: "Teams", value: String(department._count.teams) },
+        ].map((stat) => (
+          <div key={stat.label} className="rounded-xl border border-slate-200 bg-white p-4">
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">{stat.label}</p>
+            <p className="mt-2 text-xl font-semibold text-slate-900">{stat.value}</p>
+          </div>
+        ))}
       </div>
 
       {/* Edit Form */}
@@ -75,33 +71,31 @@ export default async function DepartmentDetailPage({
         <h3 className="mb-4 text-lg font-semibold">Teams in this Department</h3>
 
         {department.teams.length === 0 ? (
-          <div className="rounded-lg bg-gray-50 p-6 text-center text-sm text-gray-600">
-            No teams yet
+          <div className="rounded-xl border border-dashed border-slate-300 bg-white py-12 text-center">
+            <p className="text-sm text-slate-500">Chưa có đội nhóm.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b bg-gray-50">
-                <tr>
-                  <th className="px-4 py-2 text-left">Name</th>
-                  <th className="px-4 py-2 text-left">Leader</th>
-                  <th className="px-4 py-2 text-center">Members</th>
-                </tr>
-              </thead>
-              <tbody>
-                {department.teams.map((team) => (
-                  <tr key={team.id} className="border-b">
-                    <td className="px-4 py-3">{team.name}</td>
-                    <td className="px-4 py-3">
-                      {team.leader?.fullName || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {team._count.members}
-                    </td>
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200 bg-slate-50/60">
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Name</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">Leader</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wide text-slate-500">Members</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {department.teams.map((team) => (
+                    <tr key={team.id} className="transition-colors hover:bg-slate-50/60">
+                      <td className="px-4 py-3 text-slate-700">{team.name}</td>
+                      <td className="px-4 py-3 text-slate-700">{team.leader?.fullName || "—"}</td>
+                      <td className="px-4 py-3 text-center text-slate-700">{team._count.members}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </Card>
