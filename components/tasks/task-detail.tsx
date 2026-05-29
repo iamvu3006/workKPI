@@ -70,7 +70,7 @@ export function TaskDetail({ taskId, currentUserId, canEdit }: TaskDetailProps) 
             <Badge>{STATUS_LABELS[status]}</Badge>
             <Badge variant="outline">{PRIORITY_LABELS[priority]}</Badge>
             <Badge variant="outline">{task.weight as number}%</Badge>
-            {task.isOverdue && <Badge className="bg-red-100 text-red-700">Overdue</Badge>}
+            {!!task.isOverdue && <Badge className="bg-red-100 text-red-700">Overdue</Badge>}
           </div>
           <h1 className="mt-2 text-2xl font-semibold text-slate-900">{task.title as string}</h1>
           <p className="mt-1 text-sm text-slate-500">
@@ -85,7 +85,7 @@ export function TaskDetail({ taskId, currentUserId, canEdit }: TaskDetailProps) 
         )}
       </header>
 
-      {task.description && (
+      {!!task.description && (
         <section className="rounded-2xl border border-slate-200 bg-white p-4">
           <h2 className="text-sm font-semibold text-slate-700">Mô tả</h2>
           <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">{task.description as string}</p>

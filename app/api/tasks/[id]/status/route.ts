@@ -71,12 +71,6 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     if (status === "IN_PROGRESS" && !task.startedAt) {
       updateData.startedAt = new Date();
     }
-    if (status === "REVIEW") {
-      updateData.submittedAt = new Date();
-    }
-    if (status === "DONE") {
-      updateData.completedAt = new Date();
-    }
     if (status === "PENDING") {
       updateData.pendingReason = reason;
       updateData.pendingBlockType = (body.pendingBlockType as PendingBlockType) || "OTHER";

@@ -22,9 +22,7 @@ export function buildTaskAttachmentPath(taskId: string, fileName: string): strin
   return `${taskId}/${Date.now()}-${safeName}`;
 }
 
-export async function getTaskAttachmentsTotalSize(taskId: string, prisma: {
-  taskAttachment: { aggregate: (args: object) => Promise<{ _sum: { fileSize: number | null } }> };
-}): Promise<number> {
+export async function getTaskAttachmentsTotalSize(taskId: string, prisma: any): Promise<number> {
   const result = await prisma.taskAttachment.aggregate({
     where: { taskId },
     _sum: { fileSize: true },

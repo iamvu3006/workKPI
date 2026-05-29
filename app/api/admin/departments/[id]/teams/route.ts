@@ -10,7 +10,7 @@ interface RouteParams {
  * POST /api/admin/departments/[id]/teams
  * Create a new team in a department
  */
-export async function POST(request: NextRequest, { params }: { params: RouteParams }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest, { params }: { params: RoutePara
       });
     }
 
-    const { id: departmentId } = params;
+    const { id: departmentId } = await params;
     const body = await request.json();
     const { name, description, leaderId } = body;
 

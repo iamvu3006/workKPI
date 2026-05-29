@@ -10,7 +10,7 @@ interface RouteParams {
  * PATCH /api/admin/users/[id]
  * Update user information (fullName, role, departmentId)
  */
-export async function PATCH(request: NextRequest, { params }: { params: RouteParams }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { fullName, role, departmentId } = body;
 
@@ -126,7 +126,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
  * GET /api/admin/users/[id]
  * Get single user details
  */
-export async function GET(request: NextRequest, { params }: { params: RouteParams }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -135,7 +135,7 @@ export async function GET(request: NextRequest, { params }: { params: RouteParam
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     const user = await prisma.profile.findUnique({
       where: { id },

@@ -10,7 +10,7 @@ interface RouteParams {
  * PATCH /api/admin/users/[id]/department
  * Transfer user to another department
  */
-export async function PATCH(request: NextRequest, { params }: { params: RouteParams }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
       });
     }
 
-    const { id: userId } = params;
+    const { id: userId } = await params;
     const body = await request.json();
     const { departmentId, taskHandling } = body;
 

@@ -45,7 +45,7 @@ export function buildTaskListWhere(
 
   if (params.deadlineFrom || params.deadlineTo) {
     where.deadline = {
-      ...(where.deadline ?? {}),
+      ...(where.deadline as any ?? {}),
       ...(params.deadlineFrom ? { gte: params.deadlineFrom } : {}),
       ...(params.deadlineTo ? { lte: params.deadlineTo } : {}),
     };

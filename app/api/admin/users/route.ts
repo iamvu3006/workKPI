@@ -71,8 +71,7 @@ export async function GET(request: NextRequest) {
           teamName: u.team?.name || null,
         })),
         pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-      }),
-      "Fetch users successfully"
+      }, "Fetch users successfully")
     );
   } catch (error) {
     console.error("Error fetching users:", error);

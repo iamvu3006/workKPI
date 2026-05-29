@@ -105,7 +105,6 @@ export async function GET(request: NextRequest) {
       }),
       prisma.department.findMany({
         where: {
-          deletedAt: null,
           OR: [
             { name: { contains: q, mode: "insensitive" } },
             { code: { contains: q, mode: "insensitive" } },

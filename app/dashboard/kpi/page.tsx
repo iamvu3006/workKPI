@@ -25,7 +25,7 @@ export default async function KpiPage() {
   const currentYear = now.getFullYear();
 
   let currentKpi: Record<string, unknown> | null = null;
-  let trendData = [];
+  let trendData: { month: number; year: number; score: number }[] = [];
   let error = "";
 
   try {

@@ -10,7 +10,7 @@ interface RouteParams {
  * POST /api/admin/teams/[id]/members
  * Add members to a team
  */
-export async function POST(request: NextRequest, { params }: { params: RouteParams }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest, { params }: { params: RoutePara
       });
     }
 
-    const { id: teamId } = params;
+    const { id: teamId } = await params;
     const body = await request.json();
     const { userIds } = body; // Array of user IDs to add
 
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest, { params }: { params: RoutePara
  * DELETE /api/admin/teams/[id]/members/[userId]
  * Remove a member from a team
  */
-export async function DELETE(request: NextRequest, { params }: { params: RouteParams }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -145,7 +145,7 @@ export async function DELETE(request: NextRequest, { params }: { params: RoutePa
       });
     }
 
-    const { id: teamId } = params;
+    const { id: teamId } = await params;
     const userId = request.nextUrl.searchParams.get("userId");
 
     if (!userId) {

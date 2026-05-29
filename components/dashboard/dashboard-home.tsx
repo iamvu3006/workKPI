@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { DashboardView } from "@/components/dashboard/dashboard-view";
+import { DashboardView, type DashboardRole } from "@/components/dashboard/dashboard-view";
 import { Button } from "@/components/ui/button";
 import { GlobalSearch } from "@/components/layout/global-search";
 import { NotificationBell } from "../notifications/notification-bell";

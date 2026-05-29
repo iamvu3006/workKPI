@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { createClient } from "@/utils/supabase/server";
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies();
     const supabase = createClient(cookieStore);
@@ -18,7 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return NextResponse.json({ success: false, error: "Vui lòng đăng nhập." }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const notification = await prisma.notification.findUnique({ where: { id } });
     if (!notification || notification.userId !== user.id) {
       return NextResponse.json({ success: false, error: "Thông báo không tồn tại hoặc không có quyền." }, { status: 404 });

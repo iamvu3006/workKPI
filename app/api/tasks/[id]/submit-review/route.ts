@@ -68,7 +68,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       data: {
         status: "REVIEW",
         reviewSummary: summary,
-        selfAssessment: selfResult.data,
+        selfAssessment: selfResult.data as any,
         submittedAt: new Date(),
         reviewRejectReason: null,
       },

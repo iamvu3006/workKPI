@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-type DashboardRole = "EMPLOYEE" | "MANAGER" | "LEADER" | "DIRECTOR" | "ADMIN";
+export type DashboardRole = "EMPLOYEE" | "MANAGER" | "LEADER" | "DIRECTOR" | "ADMIN";
 
 type NotificationItem = {
   id: string;

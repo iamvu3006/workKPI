@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy,
+        orderBy: orderBy as any,
         include: taskListInclude,
       }),
     ]);

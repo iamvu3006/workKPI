@@ -6,15 +6,25 @@ import { Card } from "@/components/ui/card";
 export default async function DepartmentDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const [department, managers] = await Promise.all([
     prisma.department.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         manager: true,
+        _count: {
+          select: {
+            members: true,
+            teams: true,
+          },
+        },
         teams: {
           include: {
+            leader: {
+              select: { id: true, fullName: true },
+            },
             _count: {
               select: { members: true },
             },

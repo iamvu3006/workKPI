@@ -5,11 +5,12 @@ import { notFound } from "next/navigation";
 export default async function UserDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const [user, departments] = await Promise.all([
     prisma.profile.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         email: true,
@@ -31,10 +32,15 @@ export default async function UserDetailPage({
     notFound();
   }
 
+  const sanitizedUser = {
+    ...user,
+    fullName: user.fullName || "",
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{user.fullName}</h1>
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{sanitizedUser.fullName || sanitizedUser.email}</h1>
         <p className="text-sm text-slate-500">{user.email}</p>
       </div>
 
@@ -72,7 +78,7 @@ export default async function UserDetailPage({
       </div>
 
       {/* Edit Form */}
-      <UserForm user={user} departments={departments} />
+      <UserForm user={sanitizedUser} departments={departments} />
     </div>
   );
 }

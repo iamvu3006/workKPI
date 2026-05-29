@@ -10,7 +10,7 @@ interface RouteParams {
  * PATCH /api/admin/departments/[id]
  * Update department information
  */
-export async function PATCH(request: NextRequest, { params }: { params: RouteParams }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { name, description, managerId } = body;
 
@@ -136,7 +136,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
  * DELETE /api/admin/departments/[id]
  * Delete department (only if no members and no active tasks)
  */
-export async function DELETE(request: NextRequest, { params }: { params: RouteParams }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -145,7 +145,7 @@ export async function DELETE(request: NextRequest, { params }: { params: RoutePa
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Verify department exists
     const department = await prisma.department.findUnique({

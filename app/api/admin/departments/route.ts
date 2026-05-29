@@ -60,8 +60,7 @@ export async function GET(request: NextRequest) {
           teamCount: d._count.teams,
         })),
         pagination: { page, limit, total, pages: Math.ceil(total / limit) },
-      }),
-      "Fetch departments successfully"
+      }, "Fetch departments successfully")
     );
   } catch (error) {
     console.error("Error fetching departments:", error);

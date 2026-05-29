@@ -111,7 +111,7 @@ describe("POST /api/auth/login", () => {
   it("redirects to the dashboard after a successful sign-in", async () => {
     mocks.prisma.profile.findUnique.mockResolvedValue({
       id: "profile-1",
-      status: "active",
+      status: "ACTIVE",
       lockedUntil: null,
     });
     mocks.prisma.loginAttempt.findMany.mockResolvedValue([]);
@@ -175,7 +175,7 @@ describe("POST /api/auth/login", () => {
   it("stores a trusted device when the user opts in", async () => {
     mocks.prisma.profile.findUnique.mockResolvedValue({
       id: "profile-1",
-      status: "active",
+      status: "ACTIVE",
       lockedUntil: null,
     });
     mocks.prisma.loginAttempt.findMany.mockResolvedValue([]);

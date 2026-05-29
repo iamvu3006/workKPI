@@ -12,7 +12,7 @@ interface RouteParams {
  * PATCH /api/admin/users/[id]/status
  * Disable or enable a user account
  */
-export async function PATCH(request: NextRequest, { params }: { params: RouteParams }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -21,7 +21,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { status, reason } = body;
 

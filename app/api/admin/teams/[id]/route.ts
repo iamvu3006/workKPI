@@ -10,7 +10,7 @@ interface RouteParams {
  * PATCH /api/admin/teams/[id]
  * Update team information (name, description, leader)
  */
-export async function PATCH(request: NextRequest, { params }: { params: RouteParams }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
     const { isAdmin, error: adminError } = await checkAdminRole();
     if (!isAdmin) {
@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: RoutePar
       });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { name, description, leaderId } = body;
 

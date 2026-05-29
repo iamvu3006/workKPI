@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const isManuallyLocked = profile?.status === "locked" && profile.lockedUntil === null;
+    const isManuallyLocked = profile?.status === "DISABLED" && profile.lockedUntil === null;
     const isTemporarilyLocked = isLoginLockActive(recentAttempts, profile?.lockedUntil ?? null);
 
     if (isManuallyLocked || isTemporarilyLocked) {
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
         await prisma.profile.update({
           where: { id: profile.id },
           data: {
-            status: "locked",
+            status: "DISABLED",
             lockedUntil: lockoutUntil,
           },
         });
@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
       await prisma.profile.update({
         where: { id: profile.id },
         data: {
-          status: "active",
+          status: "ACTIVE",
           lockedUntil: null,
         },
       });

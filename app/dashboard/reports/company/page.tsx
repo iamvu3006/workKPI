@@ -10,7 +10,7 @@ export default async function Page({ searchParams }: Props) {
   const year = Number(searchParams?.year ?? new Date().getFullYear());
 
   const q = new URLSearchParams({ month: String(month), year: String(year) });
-  const requestHeaders = headers();
+  const requestHeaders = await headers();
   const forwardedProto = requestHeaders.get("x-forwarded-proto") ?? "http";
   const host = requestHeaders.get("host");
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${forwardedProto}://${host}` : "http://localhost:3000");

@@ -25,7 +25,7 @@ export type TaskWithRelations = Task & {
   _count?: { subtasks?: number };
 };
 
-export function serializeTask(task: TaskWithRelations) {
+export function serializeTask(task: TaskWithRelations): any {
   const now = new Date();
   const deadlineDate = new Date(task.deadline);
   const isOverdue =

@@ -54,7 +54,7 @@ export function SubmitReviewForm({ taskId, hasAttachments, onSuccess }: SubmitRe
   return (
     <section className="space-y-4 rounded-2xl border border-teal-200 bg-teal-50/40 p-4">
       <h2 className="font-semibold text-slate-900">Nộp nghiệm thu</h2>
-      <motionless className="space-y-2">
+      <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">
           Tóm tắt kết quả (≥ {MIN_REVIEW_SUMMARY_LENGTH} ký tự)
         </label>
@@ -64,9 +64,9 @@ export function SubmitReviewForm({ taskId, hasAttachments, onSuccess }: SubmitRe
           onChange={(e) => setSummary(e.target.value)}
           className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
         />
-      </motionless>
+      </div>
       {!hasAttachments && (
-        <motionless className="space-y-2">
+        <div className="space-y-2">
           <label className="text-sm font-medium text-slate-700">Mô tả bằng chứng</label>
           <textarea
             rows={2}
@@ -75,7 +75,7 @@ export function SubmitReviewForm({ taskId, hasAttachments, onSuccess }: SubmitRe
             className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
             placeholder="Hoặc upload file ở mục đính kèm phía trên"
           />
-        </motionless>
+        </div>
       )}
       {hasAttachments && (
         <p className="text-sm text-slate-600">
@@ -83,14 +83,14 @@ export function SubmitReviewForm({ taskId, hasAttachments, onSuccess }: SubmitRe
         </p>
       )}
       <SelfAssessmentForm values={selfAssessment} onChange={setSelfAssessment} disabled={loading} />
-      <motionless className="flex gap-2">
+      <div className="flex gap-2">
         <Button onClick={submit} disabled={loading}>
           {loading ? "Đang gửi..." : "Gửi nghiệm thu"}
         </Button>
         <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
           Hủy
         </Button>
-      </motionless>
+      </div>
     </section>
   );
 }
