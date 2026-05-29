@@ -156,6 +156,155 @@ const demoUsers = [
   },
 ];
 
+const extraDemoUsers = [
+  {
+    email: "manager.data@workkpi.com",
+    password: "Password123!",
+    fullName: "Huy Nguyen",
+    displayName: "Huy Data",
+    role: "MANAGER",
+    departmentKey: "data",
+    teamKey: null,
+    phone: "0901000012",
+    theme: "dark",
+    notificationEmail: true,
+    defaultTaskFilter: "department",
+  },
+  {
+    email: "manager.customer@workkpi.com",
+    password: "Password123!",
+    fullName: "My Le",
+    displayName: "My Customer",
+    role: "MANAGER",
+    departmentKey: "customerSuccess",
+    teamKey: null,
+    phone: "0901000013",
+    theme: "light",
+    notificationEmail: true,
+    defaultTaskFilter: "department",
+  },
+  {
+    email: "leader.analytics@workkpi.com",
+    password: "Password123!",
+    fullName: "Khoa Pham",
+    displayName: "Khoa Analytics",
+    role: "LEADER",
+    departmentKey: "data",
+    teamKey: "analytics",
+    phone: "0901000014",
+    theme: "light",
+    notificationEmail: true,
+    defaultTaskFilter: "team",
+  },
+  {
+    email: "leader.qa@workkpi.com",
+    password: "Password123!",
+    fullName: "Ngan Tran",
+    displayName: "Ngan QA",
+    role: "LEADER",
+    departmentKey: "data",
+    teamKey: "qa",
+    phone: "0901000015",
+    theme: "dark",
+    notificationEmail: true,
+    defaultTaskFilter: "team",
+  },
+  {
+    email: "employee.design@workkpi.com",
+    password: "Password123!",
+    fullName: "Lam Vo",
+    displayName: "Lam Design",
+    role: "EMPLOYEE",
+    departmentKey: "product",
+    teamKey: "design",
+    phone: "0901000016",
+    theme: "light",
+    notificationEmail: true,
+    defaultTaskFilter: "mine",
+  },
+  {
+    email: "employee.docs@workkpi.com",
+    password: "Password123!",
+    fullName: "An Bui",
+    displayName: "An Docs",
+    role: "EMPLOYEE",
+    departmentKey: "exec",
+    teamKey: "strategy",
+    phone: "0901000017",
+    theme: "light",
+    notificationEmail: true,
+    defaultTaskFilter: "mine",
+  },
+  {
+    email: "employee.ops2@workkpi.com",
+    password: "Password123!",
+    fullName: "Phuong Hoang",
+    displayName: "Phuong Ops",
+    role: "EMPLOYEE",
+    departmentKey: "ops",
+    teamKey: "support",
+    phone: "0901000018",
+    theme: "dark",
+    notificationEmail: true,
+    defaultTaskFilter: "mine",
+  },
+  {
+    email: "employee.data@workkpi.com",
+    password: "Password123!",
+    fullName: "Duy Phan",
+    displayName: "Duy Data",
+    role: "EMPLOYEE",
+    departmentKey: "data",
+    teamKey: "analytics",
+    phone: "0901000019",
+    theme: "light",
+    notificationEmail: true,
+    defaultTaskFilter: "mine",
+  },
+  {
+    email: "employee.success@workkpi.com",
+    password: "Password123!",
+    fullName: "Han Do",
+    displayName: "Han Success",
+    role: "EMPLOYEE",
+    departmentKey: "customerSuccess",
+    teamKey: "support",
+    phone: "0901000020",
+    theme: "light",
+    notificationEmail: true,
+    defaultTaskFilter: "mine",
+  },
+];
+
+const sampleUsers = [...demoUsers, ...extraDemoUsers];
+
+const sampleCounts = {
+  users: 20,
+  departments: 5,
+  teams: 8,
+  tasks: 100,
+  subtasks: 40,
+  comments: 200,
+  attachments: 30,
+  checklistItems: 80,
+  statusHistory: 150,
+  extendRequests: 20,
+  notifications: 100,
+  sessions: 50,
+  trustedDevices: 30,
+  loginAttempts: 40,
+  kpiRecords: 60,
+  auditLogs: 120,
+};
+
+function cycle(items, index) {
+  return items[index % items.length];
+}
+
+function repeat(count, factory) {
+  return Array.from({ length: count }, (_, index) => factory(index));
+}
+
 const now = new Date();
 
 function addDays(baseDate, days, hours = 10) {
@@ -252,7 +401,7 @@ async function ensureAuthUsers() {
   const userByEmail = new Map((data.users ?? []).map((user) => [user.email?.toLowerCase() ?? "", user]));
   const resolvedUsers = new Map();
 
-  for (const userConfig of demoUsers) {
+  for (const userConfig of sampleUsers) {
     const emailKey = userConfig.email.toLowerCase();
     const existingUser = userByEmail.get(emailKey);
 
@@ -302,11 +451,18 @@ async function main() {
         exec: randomUUID(),
         product: randomUUID(),
         ops: randomUUID(),
+        data: randomUUID(),
+        customerSuccess: randomUUID(),
       },
       teams: {
         backend: randomUUID(),
         mobile: randomUUID(),
         care: randomUUID(),
+        analytics: randomUUID(),
+        qa: randomUUID(),
+        design: randomUUID(),
+        strategy: randomUUID(),
+        support: randomUUID(),
       },
       tasks: {},
     };
@@ -516,6 +672,190 @@ async function main() {
       ["subKpiTests", subtaskDefinitions[2].id],
     ]);
 
+    const generatedTasks = repeat(sampleCounts.tasks - allTasks.length, (index) => {
+      const isSubtask = index < sampleCounts.subtasks - subtaskDefinitions.length;
+      const departmentId = cycle(
+        [
+          ids.departments.exec,
+          ids.departments.product,
+          ids.departments.ops,
+          ids.departments.data,
+          ids.departments.customerSuccess,
+        ],
+        index
+      );
+      const creator = cycle(sampleUsers, index);
+      const status = cycle(["TO_DO", "IN_PROGRESS", "PENDING", "REVIEW", "DONE", "CANCELLED"], index);
+      const priority = cycle(["LOW", "NORMAL", "HIGH", "URGENT"], index);
+      const task = demoTask(`Mau task ${index + 1}`, {
+        departmentId,
+        createdById: userId(creator.email),
+        status,
+        priority,
+        weight: 20 + ((index * 7) % 85),
+        deadline: addDays(now, (index % 12) - 4),
+        progressPercent: status === "DONE" ? 100 : status === "REVIEW" ? 88 : status === "IN_PROGRESS" ? 62 : status === "PENDING" ? 40 : 0,
+        tags: ["seed", departmentId === ids.departments.exec ? "exec" : departmentId === ids.departments.product ? "product" : departmentId === ids.departments.ops ? "ops" : departmentId === ids.departments.data ? "data" : "cx"],
+        startedAt: status === "TO_DO" || status === "CANCELLED" ? null : addDays(now, -((index % 8) + 1), 9),
+        submittedAt: status === "REVIEW" || status === "DONE" ? addDays(now, -((index % 5) + 1), 14) : null,
+        reviewedAt: status === "REVIEW" || status === "DONE" ? addDays(now, -((index % 4) + 1), 16) : null,
+        reviewedById: status === "REVIEW" || status === "DONE" ? userId(cycle(sampleUsers, index + 3).email) : null,
+        completedAt: status === "DONE" ? addDays(now, -((index % 3) + 1), 18) : null,
+        cancelledAt: status === "CANCELLED" ? addDays(now, -((index % 3) + 1), 13) : null,
+        pendingReason: status === "PENDING" ? "Dang cho du lieu bo sung cho seed." : null,
+        pendingBlockType: status === "PENDING" ? cycle(["RESOURCE", "SKILL", "OTHER"], index) : null,
+        reviewSummary: status === "REVIEW" || status === "DONE" ? "Ban ghi mau phuc vu demo." : null,
+        qualityScoreRaw: status === "REVIEW" || status === "DONE" ? 78 + (index % 15) : null,
+        qualityScore: status === "REVIEW" || status === "DONE" ? 79 + (index % 15) : null,
+      });
+
+      if (isSubtask) {
+        task.parentTaskId = taskByKey.parentKpiTask;
+      }
+
+      return task;
+    });
+
+    const seededTasks = [...allTasks, ...generatedTasks];
+    const seededTaskIds = seededTasks.map((task) => task.id);
+
+    const generatedComments = repeat(sampleCounts.comments - 3, (index) => ({
+      id: randomUUID(),
+      taskId: cycle(seededTaskIds, index),
+      authorId: userId(cycle(sampleUsers, index).email),
+      content: `Comment mau ${index + 1} cho task seed.`,
+      parentId: null,
+    }));
+
+    const generatedAttachments = repeat(sampleCounts.attachments - 2, (index) => ({
+      id: randomUUID(),
+      taskId: cycle(seededTaskIds, index + 5),
+      uploadedById: userId(cycle(sampleUsers, index + 2).email),
+      fileName: `file-${index + 1}.pdf`,
+      fileUrl: `https://example.com/files/file-${index + 1}.pdf`,
+      storagePath: `demo/tasks/file-${index + 1}.pdf`,
+      fileSize: 48_000 + index * 1_000,
+      mimeType: "application/pdf",
+    }));
+
+    const generatedChecklistItems = repeat(sampleCounts.checklistItems - 5, (index) => ({
+      id: randomUUID(),
+      taskId: cycle(seededTaskIds, index + 7),
+      title: `Checklist mau ${index + 1}`,
+      isDone: index % 3 === 0,
+      sortOrder: index + 1,
+    }));
+
+    const generatedStatusHistory = repeat(sampleCounts.statusHistory - 3, (index) => ({
+      id: randomUUID(),
+      taskId: cycle(seededTaskIds, index),
+      fromStatus: cycle(["TO_DO", "IN_PROGRESS", "PENDING", "REVIEW", "DONE"], index),
+      toStatus: cycle(["IN_PROGRESS", "PENDING", "REVIEW", "DONE", "CANCELLED"], index),
+      reason: `Lich su trang thai mau ${index + 1}`,
+      actorId: userId(cycle(sampleUsers, index + 1).email),
+      metadata: { source: "seed", index },
+    }));
+
+    const generatedExtendRequests = repeat(sampleCounts.extendRequests - 2, (index) => ({
+      id: randomUUID(),
+      taskId: cycle(seededTaskIds, index + 10),
+      requestedById: userId(cycle(sampleUsers, index + 4).email),
+      proposedDeadline: addDays(now, (index % 8) + 2),
+      reason: `De nghi gia han mau ${index + 1}`,
+      status: cycle(["PENDING", "APPROVED", "REJECTED"], index),
+      reviewedById: index % 3 === 0 ? null : userId(cycle(sampleUsers, index + 5).email),
+      reviewedAt: index % 3 === 0 ? null : addDays(now, -(index % 5), 15),
+    }));
+
+    const generatedNotifications = repeat(sampleCounts.notifications - 4, (index) => ({
+      id: randomUUID(),
+      userId: userId(cycle(sampleUsers, index).email),
+      type: cycle(["task.assigned", "task.completed", "task.review", "security.device_trusted"], index),
+      title: `Thong bao mau ${index + 1}`,
+      body: `Noi dung thong bao mau so ${index + 1}.`,
+      payload: { index, source: "seed" },
+      readAt: index % 2 === 0 ? null : addDays(now, -1, 15),
+      createdAt: addDays(now, -(index % 6), 8),
+    }));
+
+    const generatedSessions = repeat(sampleCounts.sessions - (sampleUsers.length + 6), (index) => ({
+      id: randomUUID(),
+      userId: userId(cycle(sampleUsers, index).email),
+      sessionTokenHash: hashToken(makeToken()),
+      deviceName: cycle(["MacBook Pro", "Windows Laptop", "iPad", "Pixel 8"], index),
+      ipAddress: `10.10.2.${index + 1}`,
+      userAgent: `WorkKPI Demo Session/${index + 1}`,
+      isCurrent: index % 3 === 0,
+      revokedAt: index % 3 === 0 ? null : addDays(now, -((index % 7) + 2), 12),
+      lastSeenAt: addDays(now, -((index % 4) + 1), 9),
+      expiresAt: addDays(now, (index % 12) + 1, 9),
+      createdAt: addDays(now, -((index % 9) + 2), 9),
+      updatedAt: addDays(now, -((index % 5) + 1), 10),
+    }));
+
+    const generatedTrustedDevices = repeat(sampleCounts.trustedDevices - sampleUsers.length, (index) => {
+      const deviceName = cycle(["MacBook Pro", "Surface Laptop", "ThinkPad", "iPhone"], index);
+      const userAgent = `WorkKPI Demo Device/${index + 1}`;
+
+      return {
+        id: randomUUID(),
+        userId: userId(cycle(sampleUsers, index).email),
+        deviceFingerprint: buildFingerprint(deviceName, userAgent),
+        deviceName,
+        ipAddress: `10.10.3.${index + 1}`,
+        userAgent,
+        trustedUntil: addDays(now, 30 - (index % 7), 8),
+        lastSeenAt: addDays(now, -((index % 5) + 1), 10),
+        createdAt: addDays(now, -((index % 12) + 2), 11),
+        updatedAt: addDays(now, -((index % 4) + 1), 10),
+      };
+    });
+
+    const generatedLoginAttempts = repeat(sampleCounts.loginAttempts - 3, (index) => ({
+      id: randomUUID(),
+      email: cycle(sampleUsers, index).email,
+      userId: userId(cycle(sampleUsers, index).email),
+      ipAddress: `10.10.4.${index + 1}`,
+      userAgent: `Demo Browser/${index + 1}`,
+      success: index % 4 !== 0,
+      failureReason: index % 4 !== 0 ? null : "Invalid credentials",
+      attemptedAt: addDays(now, -((index % 10) + 1), 8),
+    }));
+
+    const generatedKpiRecords = repeat(sampleCounts.kpiRecords - sampleUsers.length * 2, (index) => {
+      const userConfig = cycle(sampleUsers, index);
+      const recordMonth = startOfMonth(now, -2 - index);
+      const score = 60 + (index % 35);
+
+      return {
+        id: randomUUID(),
+        userId: userId(userConfig.email),
+        month: recordMonth.getMonth() + 1,
+        year: recordMonth.getFullYear(),
+        totalScore: score,
+        grade: gradeForScore(score),
+        taskBreakdown: {
+          done: 2 + (index % 5),
+          inProgress: 1 + (index % 4),
+          overdue: index % 3,
+          pending: index % 2,
+        },
+        onTimeRate: Math.max(55, 84 - (index % 18)),
+        calculatedAt: addDays(now, -((index % 6) + 1), 18),
+        calculatedById: userId(cycle(sampleUsers, index + 1).email),
+      };
+    });
+
+    const generatedAuditLogs = repeat(sampleCounts.auditLogs - 5, (index) => ({
+      id: randomUUID(),
+      actorUserId: userId(cycle(sampleUsers, index).email),
+      action: cycle(["login", "logout", "profile_updated", "settings_updated", "password_changed"], index),
+      entityType: cycle(["profile", "task", "user_session", "notification"], index),
+      entityId: index % 2 === 0 ? null : cycle(seededTaskIds, index),
+      metadata: { source: "seed", index },
+      createdAt: addDays(now, -((index % 14) + 1), 9),
+    }));
+
     console.log("Refreshing demo database rows...");
 
     await prisma.$transaction([
@@ -537,7 +877,7 @@ async function main() {
       prisma.profile.deleteMany(),
     ]);
 
-    const profileRows = demoUsers.map((userConfig) => ({
+    const profileRows = sampleUsers.map((userConfig) => ({
       id: userId(userConfig.email),
       email: userConfig.email,
       fullName: userConfig.fullName,
@@ -584,6 +924,20 @@ async function main() {
         description: "Ho tro khach hang, quy trinh van hanh va bao cao dinh ky.",
         managerId: userId("manager.ops@workkpi.com"),
       },
+      {
+        id: ids.departments.data,
+        name: "Du Lieu & Phan Tich",
+        code: "DATA",
+        description: "Quan tri du lieu KPI, dashboard phan tich va chat luong so lieu.",
+        managerId: userId("manager.data@workkpi.com"),
+      },
+      {
+        id: ids.departments.customerSuccess,
+        name: "Thanh Cong Khach Hang",
+        code: "CUST",
+        description: "Xu ly y kien, hanh trinh khach hang va thong bao lien quan.",
+        managerId: userId("manager.customer@workkpi.com"),
+      },
     ];
 
     await prisma.department.createMany({ data: departments });
@@ -610,12 +964,47 @@ async function main() {
         leaderId: userId("leader.care@workkpi.com"),
         departmentId: ids.departments.ops,
       },
+      {
+        id: ids.teams.analytics,
+        name: "Analytics Core",
+        description: "Doi phan tich KPI, so lieu tong hop va mo hinh bao cao.",
+        leaderId: userId("leader.analytics@workkpi.com"),
+        departmentId: ids.departments.data,
+      },
+      {
+        id: ids.teams.qa,
+        name: "Quality Assurance",
+        description: "Doi kiem thu chat luong du lieu va quy trinh KPI.",
+        leaderId: userId("leader.qa@workkpi.com"),
+        departmentId: ids.departments.data,
+      },
+      {
+        id: ids.teams.design,
+        name: "Product Design",
+        description: "Doi thiet ke dashboard va luong tuong tac nguoi dung.",
+        leaderId: userId("leader.mobile@workkpi.com"),
+        departmentId: ids.departments.product,
+      },
+      {
+        id: ids.teams.strategy,
+        name: "Strategy Docs",
+        description: "Doi tai lieu chien luoc, quy dinh va mo ta scope.",
+        leaderId: userId("director@workkpi.com"),
+        departmentId: ids.departments.exec,
+      },
+      {
+        id: ids.teams.support,
+        name: "Customer Support",
+        description: "Doi ho tro khach hang, ticket va thong bao.",
+        leaderId: userId("manager.customer@workkpi.com"),
+        departmentId: ids.departments.customerSuccess,
+      },
     ];
 
     await prisma.team.createMany({ data: teams });
 
     await Promise.all(
-      demoUsers.map((userConfig) => {
+      sampleUsers.map((userConfig) => {
         const updates = {
           departmentId: ids.departments[userConfig.departmentKey],
           teamId: userConfig.teamKey ? ids.teams[userConfig.teamKey] : null,
@@ -625,7 +1014,7 @@ async function main() {
       })
     );
 
-    await prisma.task.createMany({ data: allTasks });
+    await prisma.task.createMany({ data: seededTasks });
 
     const taskAssignments = [
       ["execRoadmap", ["director@workkpi.com", "admin@workkpi.com"]],
@@ -658,6 +1047,7 @@ async function main() {
         { id: randomUUID(), taskId: taskByKey.parentKpiTask, title: "Gan widget xep hang ca nhan", isDone: false, sortOrder: 3 },
         { id: randomUUID(), taskId: taskByKey.kpiDashboard, title: "Kiem tra responsive mobile", isDone: true, sortOrder: 1 },
         { id: randomUUID(), taskId: taskByKey.supportProcess, title: "Duyet quy trinh ticket", isDone: false, sortOrder: 1 },
+        ...generatedChecklistItems,
       ],
     });
 
@@ -684,6 +1074,7 @@ async function main() {
           content: "Se can them du lieu KPI mau de lam chart dep hon.",
           parentId: null,
         },
+        ...generatedComments,
       ],
     });
 
@@ -709,6 +1100,7 @@ async function main() {
           fileSize: 64_000,
           mimeType: "application/pdf",
         },
+        ...generatedAttachments,
       ],
     });
 
@@ -741,6 +1133,7 @@ async function main() {
           actorId: userId("leader.backend@workkpi.com"),
           metadata: { stage: "development" },
         },
+        ...generatedStatusHistory,
       ],
     });
 
@@ -766,13 +1159,14 @@ async function main() {
           reviewedById: userId("manager.product@workkpi.com"),
           reviewedAt: addDays(now, -1, 15),
         },
+        ...generatedExtendRequests,
       ],
     });
 
     const loginNow = addDays(now, -1, 9);
     const sessionExpiry = addDays(loginNow, 8, 9);
 
-    const currentSessions = demoUsers.map((userConfig, index) => {
+    const currentSessions = sampleUsers.map((userConfig, index) => {
       const rawToken = makeToken();
       const createdAt = new Date(loginNow.getTime() - index * 60_000);
 
@@ -792,7 +1186,7 @@ async function main() {
       };
     });
 
-    const revokedSessions = demoUsers.slice(0, 6).map((userConfig, index) => {
+    const revokedSessions = sampleUsers.slice(0, 6).map((userConfig, index) => {
       const oldToken = makeToken();
       const lastSeenAt = addDays(now, -12 - index, 8);
       const revokedAt = addDays(now, -10 - index, 12);
@@ -813,9 +1207,9 @@ async function main() {
       };
     });
 
-    await prisma.userSession.createMany({ data: [...currentSessions, ...revokedSessions] });
+    await prisma.userSession.createMany({ data: [...currentSessions, ...revokedSessions, ...generatedSessions] });
 
-    const trustedDevices = demoUsers.map((userConfig, index) => {
+    const trustedDevices = sampleUsers.map((userConfig, index) => {
       const deviceName = index % 2 === 0 ? "MacBook Pro" : "Surface Laptop";
       const userAgent = `WorkKPI Demo Agent/${index + 1}`;
 
@@ -833,7 +1227,7 @@ async function main() {
       };
     });
 
-    await prisma.trustedDevice.createMany({ data: trustedDevices });
+    await prisma.trustedDevice.createMany({ data: [...trustedDevices, ...generatedTrustedDevices] });
 
     await prisma.loginAttempt.createMany({
       data: [
@@ -867,6 +1261,7 @@ async function main() {
           failureReason: null,
           attemptedAt: addDays(now, -3, 9),
         },
+        ...generatedLoginAttempts,
       ],
     });
 
@@ -912,11 +1307,12 @@ async function main() {
           readAt: null,
           createdAt: addDays(now, 0, 8),
         },
+        ...generatedNotifications,
       ],
     });
 
     await prisma.kpiRecord.createMany({
-      data: demoUsers.flatMap((userConfig, index) => {
+      data: [...sampleUsers.flatMap((userConfig, index) => {
         const baseScore =
           userConfig.role === "ADMIN"
             ? 96
@@ -966,7 +1362,7 @@ async function main() {
             calculatedById: userId("director@workkpi.com"),
           },
         ];
-      }),
+      }), ...generatedKpiRecords],
     });
 
     await prisma.auditLog.createMany({
@@ -1016,12 +1412,15 @@ async function main() {
           metadata: { reason: "manual" },
           createdAt: addDays(now, -4, 18),
         },
+        ...generatedAuditLogs,
       ],
     });
 
     console.log("Demo seed completed successfully.");
-    console.log(`Created or reused ${demoUsers.length} auth users.`);
-    console.log(`Seeded ${allTasks.length} tasks, 3 departments, 3 teams, KPI rows, notifications, sessions and audit logs.`);
+    console.log(`Created or reused ${sampleUsers.length} auth users.`);
+    console.log(
+      `Seeded ${seededTasks.length} tasks, ${departments.length} departments, ${teams.length} teams, KPI rows, notifications, sessions and audit logs.`
+    );
   } catch (error) {
     console.error(error instanceof Error ? error.message : error);
     process.exitCode = 1;
