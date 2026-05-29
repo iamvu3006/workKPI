@@ -83,12 +83,12 @@ type DashboardViewProps = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  TO_DO: "To-Do",
-  IN_PROGRESS: "In Progress",
-  PENDING: "Pending",
-  REVIEW: "Review",
-  DONE: "Done",
-  CANCELLED: "Cancelled",
+  TO_DO: "Việc cần làm",
+  IN_PROGRESS: "Đang làm",
+  PENDING: "Tạm dừng",
+  REVIEW: "Chờ duyệt",
+  DONE: "Đã xong",
+  CANCELLED: "Đã hủy",
 };
 
 const PRIORITY_LABELS: Record<string, string> = {
@@ -103,7 +103,7 @@ const ROLE_LABELS: Record<DashboardRole, string> = {
   LEADER: "Leader",
   MANAGER: "Trưởng phòng",
   DIRECTOR: "Ban giám đốc",
-  ADMIN: "Quản trị",
+  ADMIN: "Quản trị viên",
 };
 
 function formatScore(score: number | null) {
@@ -133,7 +133,7 @@ function ToneDot({ tone }: { tone: "teal" | "amber" | "rose" | "slate" }) {
     slate: "bg-slate-400",
   }[tone];
 
-  return <span className={`mt-1 inline-block size-2 rounded-full ${toneClass}`} />;
+  return <span className={`mt-1.5 inline-block size-2 shrink-0 rounded-full ${toneClass}`} />;
 }
 
 function MetricCard({
@@ -148,14 +148,14 @@ function MetricCard({
   tone: "teal" | "amber" | "rose" | "slate";
 }) {
   return (
-    <Card className="border-slate-200 bg-white/90">
-      <CardContent className="p-5">
-        <div className="flex items-start gap-3">
+    <Card className="border-slate-200 bg-white shadow-sm rounded-xl">
+      <CardContent className="p-4.5">
+        <div className="flex items-start gap-2.5">
           <ToneDot tone={tone} />
           <div className="min-w-0">
-            <p className="text-sm font-medium text-slate-600">{label}</p>
-            <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">{value}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-500">{note}</p>
+            <p className="text-xs font-semibold text-slate-500">{label}</p>
+            <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-slate-950">{value}</p>
+            <p className="mt-1 text-[11px] leading-relaxed text-slate-400 truncate">{note}</p>
           </div>
         </div>
       </CardContent>
@@ -175,59 +175,61 @@ function SectionCard({
   action?: React.ReactNode;
 }) {
   return (
-    <Card className="border-slate-200 bg-white/95 shadow-sm">
-      <CardHeader className="flex flex-row items-start justify-between gap-4 border-slate-200 px-6 py-5">
+    <Card className="border-slate-200 bg-white shadow-sm rounded-xl">
+      <CardHeader className="flex flex-row items-center justify-between gap-4 border-b border-slate-100 px-5 py-4">
         <div>
-          <CardTitle className="text-base text-slate-950">{title}</CardTitle>
-          <CardDescription className="mt-1 text-sm text-slate-600">{description}</CardDescription>
+          <CardTitle className="text-sm font-bold text-slate-900">{title}</CardTitle>
+          <CardDescription className="mt-0.5 text-xs text-slate-500">{description}</CardDescription>
         </div>
         {action}
       </CardHeader>
-      <CardContent className="p-6">{children}</CardContent>
+      <CardContent className="p-5">{children}</CardContent>
     </Card>
   );
 }
 
 function StatusPill({ status }: { status: string }) {
-  const tone =
-    status === "DONE"
-      ? "success"
-      : status === "REVIEW"
-        ? "warning"
-        : status === "PENDING"
-          ? "secondary"
-          : status === "IN_PROGRESS"
-            ? "accent"
-            : "default";
+  const badgeStyle = {
+    DONE: "bg-teal-50 text-teal-700 border-teal-200/50 hover:bg-teal-50",
+    REVIEW: "bg-amber-50 text-amber-700 border-amber-200/50 hover:bg-amber-50",
+    PENDING: "bg-slate-100 text-slate-600 border-slate-200/50 hover:bg-slate-100",
+    IN_PROGRESS: "bg-blue-50 text-blue-700 border-blue-200/50 hover:bg-blue-50",
+    TO_DO: "bg-indigo-50 text-indigo-700 border-indigo-200/50 hover:bg-indigo-50",
+    CANCELLED: "bg-rose-50 text-rose-600 border-rose-200/50 hover:bg-rose-50",
+  }[status] ?? "bg-slate-50 text-slate-600 border-slate-200";
 
-  return <Badge variant={tone as never}>{STATUS_LABELS[status] ?? status}</Badge>;
+  return (
+    <Badge variant="outline" className={`rounded-lg px-2 py-0.5 text-[10px] font-semibold tracking-wide border ${badgeStyle}`}>
+      {STATUS_LABELS[status] ?? status}
+    </Badge>
+  );
 }
 
 function OverviewMetricRow({ counts }: { counts: Record<string, number> }) {
   const items = [
-    { key: "TO_DO", label: "To-Do" },
-    { key: "IN_PROGRESS", label: "In Progress" },
-    { key: "PENDING", label: "Pending" },
-    { key: "REVIEW", label: "Review" },
-    { key: "DONE", label: "Done" },
+    { key: "TO_DO", label: "Cần làm" },
+    { key: "IN_PROGRESS", label: "Đang làm" },
+    { key: "PENDING", label: "Tạm dừng" },
+    { key: "REVIEW", label: "Chờ duyệt" },
+    { key: "DONE", label: "Đã xong" },
   ];
 
   const total = items.reduce((sum, item) => sum + (counts[item.key] ?? 0), 0);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {items.map((item) => {
         const count = counts[item.key] ?? 0;
         const width = total > 0 ? Math.max(6, Math.round((count / total) * 100)) : 0;
         return (
           <div key={item.key} className="space-y-1">
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-slate-600">{item.label}</span>
-              <span className="font-medium text-slate-900">{count}</span>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-500 font-medium">{item.label}</span>
+              <span className="font-bold text-slate-800">{count}</span>
             </div>
-            <div className="h-2 rounded-full bg-slate-100">
+            <div className="h-1.5 rounded-full bg-slate-100">
               <div
-                className="h-2 rounded-full bg-gradient-to-r from-teal-500 to-cyan-500"
+                className="h-full rounded-full bg-teal-500 transition-all duration-300"
                 style={{ width: `${width}%` }}
               />
             </div>
@@ -240,25 +242,25 @@ function OverviewMetricRow({ counts }: { counts: Record<string, number> }) {
 
 function MiniTaskList({ tasks }: { tasks: TaskItem[] }) {
   if (tasks.length === 0) {
-    return <p className="text-sm text-slate-500">Chưa có task nổi bật trong phạm vi này.</p>;
+    return <p className="text-xs text-slate-400 py-2">Chưa có công việc nổi bật trong phạm vi này.</p>;
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {tasks.map((task) => (
-        <div key={task.id} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
+        <div key={task.id} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 hover:border-slate-200 transition-colors">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="font-medium text-slate-950">{task.title}</h3>
-              <p className="mt-1 text-sm text-slate-600">
-                {task.deadline} · {PRIORITY_LABELS[task.priority] ?? task.priority}
+              <h3 className="text-xs font-bold text-slate-800 truncate">{task.title}</h3>
+              <p className="mt-1 text-[10px] text-slate-400 font-medium">
+                {task.deadline} · Ưu tiên: {PRIORITY_LABELS[task.priority] ?? task.priority}
               </p>
             </div>
             <StatusPill status={task.status} />
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[9px] text-slate-500">
             {task.assignees.slice(0, 3).map((assignee) => (
-              <span key={assignee} className="rounded-full border border-slate-200 bg-white px-2.5 py-1">
+              <span key={assignee} className="rounded-md border border-slate-200/50 bg-white px-2 py-0.5 font-medium">
                 {assignee}
               </span>
             ))}
@@ -271,62 +273,62 @@ function MiniTaskList({ tasks }: { tasks: TaskItem[] }) {
 
 function MemberTable({ members }: { members: MemberItem[] }) {
   if (members.length === 0) {
-    return <p className="text-sm text-slate-500">Chưa có dữ liệu thành viên trong phạm vi này.</p>;
+    return <p className="text-xs text-slate-400 py-2">Chưa có dữ liệu thành viên.</p>;
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-slate-200">
-      <table className="min-w-full divide-y divide-slate-200 text-sm">
-        <thead className="bg-slate-50 text-slate-600">
-          <tr>
-            <th className="px-4 py-3 text-left font-medium">Thành viên</th>
-            <th className="px-4 py-3 text-left font-medium">Vai trò</th>
-            <th className="px-4 py-3 text-left font-medium">Phòng</th>
-            <th className="px-4 py-3 text-left font-medium">KPI tháng</th>
-            <th className="px-4 py-3 text-left font-medium">On-time</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-200 bg-white">
-          {members.map((member) => (
-            <tr key={member.id}>
-              <td className="px-4 py-3 text-slate-900">
-                <div className="flex items-center gap-3">
-                  <div className="flex size-9 items-center justify-center rounded-full bg-teal-50 text-xs font-semibold text-teal-800">
-                    {initials(member.name)}
-                  </div>
-                  <span className="font-medium">{member.name}</span>
-                </div>
-              </td>
-              <td className="px-4 py-3 text-slate-600">{member.role}</td>
-              <td className="px-4 py-3 text-slate-600">{member.departmentName ?? "-"}</td>
-              <td className="px-4 py-3 font-medium text-slate-900">{formatScore(member.kpi)}</td>
-              <td className="px-4 py-3 text-slate-600">{formatPercent(member.onTimeRate)}</td>
+    <div className="overflow-hidden rounded-xl border border-slate-100">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-slate-100 text-xs">
+          <thead className="bg-slate-50/80 text-slate-500 font-semibold">
+            <tr>
+              <th className="px-3.5 py-2.5 text-left font-bold uppercase tracking-wider text-[9px]">Thành viên</th>
+              <th className="px-3.5 py-2.5 text-left font-bold uppercase tracking-wider text-[9px]">Vai trò</th>
+              <th className="px-3.5 py-2.5 text-left font-bold uppercase tracking-wider text-[9px]">Phòng ban</th>
+              <th className="px-3.5 py-2.5 text-left font-bold uppercase tracking-wider text-[9px]">KPI</th>
+              <th className="px-3.5 py-2.5 text-left font-bold uppercase tracking-wider text-[9px]">Đúng hạn</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-100 bg-white">
+            {members.map((member) => (
+              <tr key={member.id} className="hover:bg-slate-50/30 transition-colors">
+                <td className="px-3.5 py-2.5 text-slate-900">
+                  <div className="flex items-center gap-2.5">
+                    <div className="flex size-7.5 shrink-0 items-center justify-center rounded-full bg-teal-50 text-[10px] font-bold text-teal-800">
+                      {initials(member.name)}
+                    </div>
+                    <span className="font-semibold text-xs truncate max-w-[120px]">{member.name}</span>
+                  </div>
+                </td>
+                <td className="px-3.5 py-2.5 text-slate-500 font-medium">{member.role}</td>
+                <td className="px-3.5 py-2.5 text-slate-500 font-medium">{member.departmentName ?? "-"}</td>
+                <td className="px-3.5 py-2.5 font-bold text-slate-900">{formatScore(member.kpi)}</td>
+                <td className="px-3.5 py-2.5 text-slate-500 font-bold">{formatPercent(member.onTimeRate)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
 
 function DepartmentTable({ departments }: { departments: DepartmentItem[] }) {
   if (departments.length === 0) {
-    return <p className="text-sm text-slate-500">Chưa có dữ liệu phòng ban cho tháng này.</p>;
+    return <p className="text-xs text-slate-400 py-2">Chưa có dữ liệu phòng ban cho tháng này.</p>;
   }
 
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-2">
       {departments.map((department) => (
-        <div key={department.name} className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <h3 className="font-medium text-slate-950">{department.name}</h3>
-              <p className="text-sm text-slate-500">{department.members} thành viên có KPI tháng</p>
-            </div>
-            <div className="text-right">
-              <div className="text-lg font-semibold text-slate-950">{formatScore(department.avgKpi)}</div>
-              <div className="text-xs uppercase tracking-[0.16em] text-slate-500">KPI trung bình</div>
-            </div>
+        <div key={department.name} className="rounded-xl border border-slate-150 bg-slate-50/50 p-3.5 flex items-center justify-between">
+          <div>
+            <h3 className="text-xs font-bold text-slate-800">{department.name}</h3>
+            <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{department.members} thành viên có KPI tháng</p>
+          </div>
+          <div className="text-right">
+            <div className="text-sm font-extrabold text-slate-950">{formatScore(department.avgKpi)}</div>
+            <div className="text-[9px] uppercase tracking-wider text-slate-400 font-semibold mt-0.5">KPI trung bình</div>
           </div>
         </div>
       ))}
@@ -344,26 +346,26 @@ function PerformerTable({
   rows: PerformerItem[];
 }) {
   if (rows.length === 0) {
-    return <p className="text-sm text-slate-500">Chưa có kết quả KPI để xếp hạng.</p>;
+    return <p className="text-xs text-slate-400 py-2">Chưa có kết quả KPI để xếp hạng.</p>;
   }
 
   return (
     <SectionCard title={title} description={description}>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {rows.map((row, index) => (
           <div
             key={`${row.name}-${index}`}
-            className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/80 p-4"
+            className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-3 hover:border-slate-200 transition-colors"
           >
             <div>
-              <div className="font-medium text-slate-950">
+              <div className="text-xs font-bold text-slate-800">
                 {index + 1}. {row.name}
               </div>
-              <div className="text-sm text-slate-500">{row.departmentName ?? "Toàn công ty"}</div>
+              <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{row.departmentName ?? "Toàn công ty"}</div>
             </div>
             <div className="text-right">
-              <div className="font-semibold text-slate-950">{formatScore(row.score)}</div>
-              <div className="text-xs uppercase tracking-[0.16em] text-slate-500">{row.grade}</div>
+              <div className="text-xs font-bold text-slate-800">{formatScore(row.score)}</div>
+              <div className="text-[9px] uppercase tracking-wider text-slate-400 font-bold mt-0.5">{row.grade}</div>
             </div>
           </div>
         ))}
@@ -374,22 +376,26 @@ function PerformerTable({
 
 function NotificationPreview({ notifications }: { notifications: NotificationItem[] }) {
   if (notifications.length === 0) {
-    return <p className="text-sm text-slate-500">Không có thông báo mới.</p>;
+    return <p className="text-xs text-slate-400 py-2">Không có thông báo mới.</p>;
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       {notifications.map((notification) => (
         <div
           key={notification.id}
-          className={`rounded-2xl border p-4 ${notification.readAt ? "border-slate-200 bg-white" : "border-teal-200 bg-teal-50/70"}`}
+          className={`rounded-xl border p-3.5 transition-colors ${
+            notification.readAt 
+              ? "border-slate-100 bg-white" 
+              : "border-teal-500/10 bg-teal-500/5"
+          }`}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="font-medium text-slate-950">{notification.title}</p>
-              <p className="mt-1 text-sm text-slate-600">{notification.body}</p>
+              <p className="text-xs font-bold text-slate-800">{notification.title}</p>
+              <p className="mt-0.5 text-xs text-slate-500 leading-relaxed">{notification.body}</p>
             </div>
-            <span className="text-xs text-slate-400">
+            <span className="text-[9px] text-slate-400 shrink-0 font-medium">
               {new Intl.DateTimeFormat("vi-VN", {
                 day: "2-digit",
                 month: "2-digit",
@@ -422,168 +428,146 @@ export function DashboardView({
   bottomPerformers,
 }: DashboardViewProps) {
   return (
-    <div className="mt-8 space-y-6">
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="mt-1 space-y-5">
+      {/* 4 Dashboard Metric Cards */}
+      <section className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           label="Thông báo chưa đọc"
           value={`${unreadCount > 99 ? "99+" : unreadCount}`}
-          note="Badge đồng bộ với inbox in-app và refresh khi focus tab."
+          note="Refresh thời gian thực khi có tín hiệu mới."
           tone="rose"
         />
         <MetricCard
           label="Task đang hoạt động"
           value={String(summary.activeTasks)}
-          note="Chỉ tính task chưa DONE/CANCELLED trong phạm vi role hiện tại."
+          note="Chưa tính các task đã DONE hoặc CANCELLED."
           tone="teal"
         />
         <MetricCard
           label="Đến hạn hôm nay"
           value={String(summary.dueToday)}
-          note="Những task cần xử lý ngay để tránh trễ deadline."
+          note="Cần ưu tiên xử lý ngay để tránh trễ hạn."
           tone="amber"
         />
         <MetricCard
-          label="Overdue"
+          label="Task quá hạn (Overdue)"
           value={String(summary.overdue)}
-          note={
-            role === "EMPLOYEE"
-              ? "KPI ước tính cá nhân lấy từ task hiện tại."
-              : "Số task quá hạn trong phạm vi xem."
-          }
+          note="Vượt quá ngày hoàn thành, đang trừ điểm KPI."
           tone="slate"
         />
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[1.35fr_0.9fr]">
+      {/* Main KPI and Status charts */}
+      <section className="grid gap-5 xl:grid-cols-[1.3fr_0.7fr]">
         <SectionCard
           title={
             role === "EMPLOYEE"
-              ? "Ước tính KPI tháng"
+              ? "Điểm hiệu suất ước tính"
               : role === "LEADER"
-                ? "Tổng quan team"
+                ? "Tổng quan KPI Nhóm"
                 : role === "MANAGER"
-                  ? "Tổng quan phòng"
-                  : "Tổng quan toàn công ty"
+                  ? "Tổng quan KPI Phòng ban"
+                  : "KPI Trung bình toàn công ty"
           }
           description={
             role === "EMPLOYEE"
-              ? "Kết quả dự phóng theo task DONE và task đang tiến hành."
+              ? "Dự phóng dựa trên các công việc đã hoàn thành và tiến độ thực tế."
               : role === "LEADER"
-                ? `Team ${teamName ?? "chưa có tên"} · ${departmentName ?? "Chưa gán phòng"}`
+                ? `Nhóm ${teamName ?? "chưa đặt tên"} · ${departmentName ?? "Chưa gán phòng"}`
                 : role === "MANAGER"
-                  ? `Phòng ${departmentName ?? "Chưa gán"} · phạm vi dữ liệu đã được giới hạn`
-                  : `Phạm vi xem theo vai trò ${ROLE_LABELS[role]}`
+                  ? `Phòng ban ${departmentName ?? "Chưa gán"}`
+                  : `Quyền hạn quan sát: ${ROLE_LABELS[role]}`
           }
           action={
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/dashboard/notifications">Xem toàn bộ thông báo</Link>
+            <Button asChild variant="ghost" size="sm" className="rounded-lg h-8 text-[11px] font-semibold cursor-pointer">
+              <Link href="/dashboard/notifications">Mở toàn bộ hộp thư</Link>
             </Button>
           }
         >
           {role === "DIRECTOR" || role === "ADMIN" ? (
             <div className="space-y-4">
-              <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-teal-950 p-6 text-white">
-                <p className="text-sm uppercase tracking-[0.18em] text-teal-200">KPI trung bình toàn công ty</p>
-                <div className="mt-3 text-5xl font-semibold tracking-tight">{formatScore(companyAvg)}</div>
-                <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
-                  Bảng xếp hạng phòng ban và top nhân viên được lấy từ KPI tháng hiện tại.
+              {/* Minimal Dark Slate Box instead of choy gradients */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5.5 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 h-24 w-24 bg-gradient-to-bl from-teal-500/10 to-transparent blur-lg rounded-bl-full" />
+                <p className="text-[10px] uppercase tracking-wider text-teal-300 font-bold">KPI Trung bình toàn công ty</p>
+                <div className="mt-2 text-4xl font-extrabold tracking-tight">{formatScore(companyAvg)}</div>
+                <p className="mt-2.5 max-w-xl text-xs text-slate-400 leading-relaxed">
+                  Bảng xếp hạng phòng ban và top nhân sự xuất sắc được tổng hợp trực tiếp từ hồ sơ KPI hoạt động tháng này.
                 </p>
               </div>
               <DepartmentTable departments={departments} />
             </div>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
-              <div className="rounded-3xl border border-slate-200 bg-gradient-to-br from-teal-950 via-teal-800 to-cyan-700 p-6 text-white">
-                <p className="text-sm uppercase tracking-[0.18em] text-teal-100">{ROLE_LABELS[role]}</p>
-                <div className="mt-3 text-5xl font-semibold tracking-tight">{formatScore(summary.kpiEstimate)}</div>
-                <p className="mt-3 text-sm leading-6 text-teal-50/90">
-                  {role === "EMPLOYEE"
-                    ? "Ước tính dựa trên task DONE và task đang tiến hành của riêng bạn."
-                    : role === "LEADER"
-                      ? "KPI trung bình team và tình trạng task của các thành viên trong team."
-                      : "KPI trung bình phòng và trạng thái task đang được quản lý."}
-                </p>
+            <div className="grid gap-4.5 lg:grid-cols-[0.9fr_1.1fr]">
+              {/* Dark Minimal Slate Box */}
+              <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5.5 text-white relative overflow-hidden flex flex-col justify-between">
+                <div className="absolute top-0 right-0 h-20 w-20 bg-gradient-to-bl from-teal-500/10 to-transparent blur-md rounded-bl-full" />
+                <div>
+                  <span className="inline-flex items-center rounded-lg bg-teal-500/10 px-2 py-0.5 text-[9px] font-bold text-teal-400 border border-teal-500/20">
+                    {ROLE_LABELS[role]}
+                  </span>
+                  <p className="text-[9px] uppercase tracking-wider text-slate-400 font-bold mt-3">KPI ước tính tháng này</p>
+                  <div className="mt-1.5 text-4xl font-extrabold tracking-tight text-teal-400">{formatScore(summary.kpiEstimate)}</div>
+                  <p className="mt-2 text-xs text-slate-400 leading-relaxed">
+                    {role === "EMPLOYEE"
+                      ? "Điểm tổng dựa trên tỷ trọng và mức độ hoàn thành task hiện tại."
+                      : role === "LEADER"
+                        ? "Điểm trung bình hoạt động của các thành viên trong nhóm."
+                        : "Điểm trung bình hoạt động của toàn bộ phòng ban."}
+                  </p>
+                </div>
                 {summary.nearestDeadline ? (
-                  <div className="mt-5 rounded-2xl bg-white/10 p-4">
-                    <p className="text-xs uppercase tracking-[0.16em] text-teal-100">Deadline gần nhất</p>
-                    <p className="mt-2 font-medium">{summary.nearestDeadline.title}</p>
-                    <p className="mt-1 text-sm text-teal-50/90">{summary.nearestDeadline.deadline}</p>
-                    <p className="mt-1 text-xs text-teal-100/90">
-                      {summary.nearestDeadline.assignees.join(", ") || "Chưa có assignee"}
+                  <div className="mt-4.5 rounded-xl bg-white/5 border border-white/10 p-3">
+                    <p className="text-[9px] uppercase tracking-wider text-teal-300 font-bold">Mốc trễ gần nhất</p>
+                    <p className="mt-1 text-xs font-bold text-slate-100 truncate">{summary.nearestDeadline.title}</p>
+                    <p className="mt-0.5 text-[10px] text-slate-300 font-medium">{summary.nearestDeadline.deadline}</p>
+                    <p className="mt-1 text-[9px] text-teal-300/80 font-bold truncate">
+                      {summary.nearestDeadline.assignees.join(", ") || "Chưa gán nhân sự"}
                     </p>
                   </div>
                 ) : null}
               </div>
 
-              <div className="space-y-4">
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm font-medium text-slate-700">Trạng thái task</p>
+              {/* Light Status Details */}
+              <div className="space-y-3.5">
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4">
+                  <p className="text-xs font-bold text-slate-700 mb-2.5">Trạng thái công việc</p>
                   <OverviewMetricRow counts={statusCounts} />
                 </div>
-                <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
-                  <p className="text-sm font-medium text-slate-700">Thông báo gần đây</p>
-                  <div className="mt-3">
-                    <NotificationPreview notifications={notifications} />
-                  </div>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4">
+                  <p className="text-xs font-bold text-slate-700 mb-2.5">Tín hiệu thông báo gần đây</p>
+                  <NotificationPreview notifications={notifications} />
                 </div>
               </div>
             </div>
           )}
         </SectionCard>
 
-      <KpiForecastWidget
-        title={forecast.title}
-        description={forecast.description}
-        scenarios={forecast.scenarios}
-        suggestions={forecast.suggestions}
-      />
-
-        <SectionCard
-          title="Mốc cần chú ý"
-          description="3 thông tin ưu tiên để xử lý ngay trong phiên làm việc hiện tại."
-        >
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-              <p className="text-sm font-medium text-slate-700">Thông báo chưa đọc</p>
-              <p className="mt-2 text-3xl font-semibold text-slate-950">{unreadCount}</p>
-            </div>
-            {summary.nearestDeadline ? (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-                <p className="text-sm font-medium text-slate-700">Deadline gần nhất</p>
-                <p className="mt-2 font-medium text-slate-950">{summary.nearestDeadline.title}</p>
-                <p className="mt-1 text-sm text-slate-600">{summary.nearestDeadline.deadline}</p>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm text-slate-600">
-                Chưa có task nào trong phạm vi hiện tại.
-              </div>
-            )}
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-4">
-              <p className="text-sm font-medium text-slate-700">Phạm vi hiện tại</p>
-              <p className="mt-2 text-sm text-slate-600">{profileName}</p>
-              <p className="mt-1 text-sm text-slate-500">
-                {departmentName ?? "Chưa gán phòng"}{teamName ? ` · ${teamName}` : ""}
-              </p>
-            </div>
-          </div>
-        </SectionCard>
+        {/* Forecast widget (Cleaned internally inside its own component) */}
+        <KpiForecastWidget
+          title={forecast.title}
+          description={forecast.description}
+          scenarios={forecast.scenarios}
+          suggestions={forecast.suggestions}
+        />
       </section>
 
+      {/* Dynamic Task lists / Member performance lists based on roles */}
       {(role === "EMPLOYEE" || role === "LEADER" || role === "MANAGER") && (
-        <section className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <section className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
           <SectionCard
-            title={role === "EMPLOYEE" ? "Task cần xử lý gấp" : "Task phạm vi hiện tại"}
-            description="Danh sách task gần deadline nhất trong phạm vi role."
+            title={role === "EMPLOYEE" ? "Công việc khẩn cần xử lý" : "Danh sách công việc đang giám sát"}
+            description="Các task có thời gian hoàn thành gần nhất trong phạm vi quyền hạn của bạn."
           >
             <MiniTaskList tasks={tasks} />
           </SectionCard>
 
           <SectionCard
-            title={role === "EMPLOYEE" ? "Tỷ lệ trạng thái task" : "Danh sách thành viên cần chú ý"}
+            title={role === "EMPLOYEE" ? "Tỷ lệ các trạng thái" : "Danh sách nhân sự cần chú ý"}
             description={
               role === "EMPLOYEE"
-                ? "Cấu trúc trạng thái trong tháng hiện tại."
-                : "KPI tháng và on-time rate của các thành viên trong phạm vi quản lý."
+                ? "Thống kê cấu trúc các công việc đã thực hiện trong tháng."
+                : "KPI thực tế và tỷ lệ đúng hạn của các thành viên trực thuộc quản lý."
             }
           >
             {role === "EMPLOYEE" ? <OverviewMetricRow counts={statusCounts} /> : <MemberTable members={members} />}
@@ -591,16 +575,17 @@ export function DashboardView({
         </section>
       )}
 
+      {/* Leaders / Director Rank Panels */}
       {role === "DIRECTOR" || role === "ADMIN" ? (
-        <section className="grid gap-6 xl:grid-cols-2">
+        <section className="grid gap-5 xl:grid-cols-2">
           <PerformerTable
-            title="Top nhân viên xuất sắc"
-            description="Xếp hạng theo KPI tháng hiện tại."
+            title="Nhóm nhân viên xuất sắc"
+            description="Top 5 nhân sự có điểm KPI cao nhất trong tháng."
             rows={topPerformers}
           />
           <PerformerTable
-            title="Nhân viên cần cải thiện"
-            description="5 người có KPI thấp nhất trong tháng hiện tại."
+            title="Nhân viên cần cải thiện hiệu suất"
+            description="Top 5 nhân sự có điểm KPI thấp nhất trong tháng."
             rows={bottomPerformers}
           />
         </section>

@@ -46,109 +46,109 @@ function normalizeName(
 
 const ROLE_META = {
   EMPLOYEE: {
-    caption: "My workbench",
+    caption: "Bàn làm việc",
     title: "Tập trung vào việc cần làm ngay",
-    description: "Theo dõi task cá nhân, thông báo, KPI ước tính và các mốc sắp đến trong một màn hình.",
-    accent: "from-teal-600 via-cyan-500 to-sky-500",
-    badge: "bg-teal-50 text-teal-800 border-teal-200",
+    description: "Theo dõi task cá nhân, thông báo, KPI ước tính và các mốc sắp đến trong một màn hình gọn gàng.",
+    accent: "from-teal-600 to-cyan-600",
+    badge: "bg-teal-50/80 text-teal-700 border-teal-200/50",
   },
   LEADER: {
-    caption: "Team command",
+    caption: "Điều hành nhóm",
     title: "Điều phối team theo nhịp làm việc rõ ràng",
-    description: "Xem task của team, trạng thái thành viên, và các tín hiệu cần xử lý trước khi chúng thành rủi ro.",
-    accent: "from-blue-600 via-sky-500 to-cyan-500",
-    badge: "bg-blue-50 text-blue-800 border-blue-200",
+    description: "Xem task của team, trạng thái thành viên và các tín hiệu cần xử lý trước khi chúng thành rủi ro.",
+    accent: "from-blue-600 to-indigo-600",
+    badge: "bg-blue-50/80 text-blue-700 border-blue-200/50",
   },
   MANAGER: {
-    caption: "Department control",
-    title: "Quản lý phòng ban với độ phủ dữ liệu rõ ràng",
+    caption: "Quản lý phòng ban",
+    title: "Quản lý phòng ban với dữ liệu trực quan",
     description: "Tập trung vào KPI phòng, luồng task, và tình hình vận hành trong phạm vi phụ trách.",
-    accent: "from-amber-500 via-orange-500 to-rose-500",
-    badge: "bg-amber-50 text-amber-800 border-amber-200",
+    accent: "from-amber-600 to-orange-600",
+    badge: "bg-amber-50/80 text-amber-700 border-amber-200/50",
   },
   DIRECTOR: {
-    caption: "Company pulse",
+    caption: "Nhịp sinh học công ty",
     title: "Nhìn toàn công ty trong một nhịp điều hành",
     description: "Theo dõi KPI, thứ tự ưu tiên và chất lượng thực thi trên toàn tổ chức.",
-    accent: "from-slate-950 via-slate-800 to-teal-900",
-    badge: "bg-slate-100 text-slate-800 border-slate-200",
+    accent: "from-slate-900 to-slate-800",
+    badge: "bg-slate-100 text-slate-700 border-slate-200",
   },
   ADMIN: {
-    caption: "Governance hub",
-    title: "Bảng điều khiển dành cho vận hành và quản trị",
-    description: "Điều phối user, phòng ban, session, và các tín hiệu bảo mật trên một workspace gọn mà mạnh.",
-    accent: "from-violet-700 via-slate-900 to-cyan-900",
-    badge: "bg-violet-50 text-violet-800 border-violet-200",
+    caption: "Trung tâm quản trị",
+    title: "Bảng điều khiển dành cho vận hành và cấu hình",
+    description: "Điều phối người dùng, phòng ban, phiên đăng nhập, và các tín hiệu bảo mật trên một workspace tinh gọn.",
+    accent: "from-violet-600 to-indigo-600",
+    badge: "bg-violet-50/80 text-violet-700 border-violet-200/50",
   },
 } satisfies Record<DashboardRole, { caption: string; title: string; description: string; accent: string; badge: string }>;
 
 function getNavItems(role: DashboardRole) {
   const base = [
-    { href: "/dashboard", label: "Home", description: "Tổng quan hoạt động" },
-    { href: "/dashboard/tasks", label: "Tasks", description: "Danh sách và workflow" },
-    { href: "/dashboard/notifications", label: "Notifications", description: "Tín hiệu mới nhất" },
-    { href: "/dashboard/profile", label: "Profile", description: "Thông tin cá nhân" },
+    { href: "/dashboard", label: "Tổng quan", description: "Bảng điều khiển chính" },
+    { href: "/dashboard/tasks", label: "Công việc", description: "Danh sách và luồng xử lý" },
+    { href: "/dashboard/notifications", label: "Thông báo", description: "Tín hiệu hoạt động" },
+    { href: "/dashboard/profile", label: "Cá nhân", description: "Hồ sơ của bạn" },
   ];
 
   if (role === "EMPLOYEE") {
     return [
       ...base,
-      { href: "/dashboard/kpi", label: "KPI", description: "Điểm cá nhân" },
-      { href: "/dashboard/reports/monthly", label: "Reports", description: "Báo cáo tháng" },
+      { href: "/dashboard/kpi", label: "Điểm KPI", description: "Theo dõi hiệu suất" },
+      { href: "/dashboard/reports/monthly", label: "Báo cáo", description: "Thống kê tháng" },
     ];
   }
 
   if (role === "LEADER") {
     return [
       ...base,
-      { href: "/dashboard/kpi/department", label: "KPI team", description: "Hiệu suất team" },
-      { href: "/dashboard/reports/weekly", label: "Weekly report", description: "Nhịp theo tuần" },
-      { href: "/dashboard/reports/monthly", label: "Reports", description: "Báo cáo tổng hợp" },
+      { href: "/dashboard/kpi/department", label: "KPI Team", description: "Hiệu suất nhóm" },
+      { href: "/dashboard/reports/weekly", label: "Báo cáo tuần", description: "Nhịp làm việc tuần" },
+      { href: "/dashboard/reports/monthly", label: "Báo cáo tháng", description: "Tổng hợp hiệu suất" },
     ];
   }
 
   if (role === "MANAGER") {
     return [
       ...base,
-      { href: "/dashboard/kpi/department", label: "Department KPI", description: "KPI phòng ban" },
-      { href: "/dashboard/reports/company", label: "Company report", description: "Góc nhìn phòng" },
-      { href: "/admin/departments", label: "Departments", description: "Tổ chức & sơ đồ" },
+      { href: "/dashboard/kpi/department", label: "KPI Phòng", description: "Hiệu suất phòng ban" },
+      { href: "/dashboard/reports/company", label: "Báo cáo chung", description: "Góc nhìn vận hành" },
+      { href: "/admin/departments", label: "Sơ đồ tổ chức", description: "Phòng ban & Team" },
     ];
   }
 
   if (role === "DIRECTOR") {
     return [
       ...base,
-      { href: "/dashboard/kpi", label: "Company KPI", description: "Chỉ số toàn công ty" },
-      { href: "/dashboard/reports/company", label: "Company report", description: "Bức tranh tổng thể" },
-      { href: "/admin/users", label: "Users", description: "Quan sát tài khoản" },
+      { href: "/dashboard/kpi", label: "KPI Công ty", description: "Chỉ số toàn công ty" },
+      { href: "/dashboard/reports/company", label: "Báo cáo tổng", description: "Bức tranh toàn cảnh" },
+      { href: "/admin/users", label: "Thành viên", description: "Tài khoản nhân sự" },
     ];
   }
 
   return [
     ...base,
-    { href: "/admin/users", label: "Users", description: "Quản trị tài khoản" },
-    { href: "/admin/departments", label: "Departments", description: "Phòng ban và team" },
-    { href: "/dashboard/reports/company", label: "Reports", description: "Báo cáo hệ thống" },
+    { href: "/admin/users", label: "Quản trị User", description: "Danh sách tài khoản" },
+    { href: "/admin/departments", label: "Quản trị Phòng", description: "Cấu trúc phòng ban" },
+    { href: "/dashboard/reports/company", label: "Báo cáo hệ thống", description: "Thống kê dữ liệu" },
   ];
 }
 
 function getActionItems(role: DashboardRole) {
   const actions: { href: string; label: string; variant?: "default" | "outline" | "ghost" }[] = [
-    { href: "/dashboard/tasks/new", label: "New work item" },
-    { href: "/dashboard/notifications", label: "Open inbox", variant: "outline" },
+    { href: "/dashboard/tasks/new", label: "Tạo việc mới" },
+    { href: "/dashboard/notifications", label: "Mở hộp thư", variant: "outline" },
   ];
 
   if (role === "EMPLOYEE") {
-    actions.push({ href: "/dashboard/profile/settings", label: "Update settings", variant: "ghost" });
+    actions.push({ href: "/dashboard/profile/settings", label: "Cài đặt cá nhân", variant: "ghost" });
   } else if (role === "LEADER") {
-    actions.push({ href: "/dashboard/tasks", label: "Review team tasks", variant: "ghost" });
+    actions.push({ href: "/dashboard/tasks", label: "Duyệt task nhóm", variant: "ghost" });
   } else if (role === "MANAGER") {
-    actions.push({ href: "/dashboard/reports/company", label: "Open reports", variant: "ghost" });
+    actions.push({ href: "/dashboard/reports/company", label: "Xem báo cáo phòng", variant: "ghost" });
   } else if (role === "DIRECTOR") {
-    actions.push({ href: "/dashboard/kpi", label: "Check KPI", variant: "ghost" });
+    actions.push({ href: "/dashboard/kpi", label: "Kiểm tra KPI", variant: "ghost" });
   } else {
-    actions.push({ href: "/admin/users", label: "Manage users", variant: "ghost" });
+    actions.push({ href: "/admin/users", label: "Quản trị tài khoản", variant: "ghost" });
   }
 
   return actions;
@@ -168,20 +168,20 @@ function SidebarLink({
   return (
     <Link
       href={href}
-      className={`group flex items-start justify-between gap-4 rounded-2xl border px-4 py-3 transition-all ${
+      className={`group flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 transition-all duration-150 ${
         active
-          ? "border-slate-300 bg-slate-950 text-white shadow-lg shadow-slate-950/10"
-          : "border-slate-200 bg-white/80 text-slate-700 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:shadow-sm"
+          ? "border-teal-500/20 bg-teal-500/5 text-teal-700 font-semibold"
+          : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
       }`}
     >
-      <span>
-        <span className="block text-sm font-medium">{label}</span>
-        <span className={`mt-1 block text-xs ${active ? "text-slate-300" : "text-slate-500"}`}>
+      <div>
+        <span className="block text-xs font-semibold">{label}</span>
+        <span className={`mt-0.5 block text-[10px] ${active ? "text-teal-600/80" : "text-slate-400 group-hover:text-slate-500"}`}>
           {description}
         </span>
-      </span>
-      <span className={`mt-1 text-xs uppercase tracking-[0.18em] ${active ? "text-slate-300" : "text-slate-400 group-hover:text-slate-600"}`}>
-        Open
+      </div>
+      <span className={`text-[9px] font-bold uppercase tracking-wider opacity-0 transition-opacity group-hover:opacity-100 ${active ? "text-teal-600" : "text-slate-400"}`}>
+        Mở
       </span>
     </Link>
   );
@@ -197,7 +197,7 @@ function ActionLink({
   variant?: "default" | "outline" | "ghost";
 }) {
   return (
-    <Button asChild variant={variant} size="lg" className="rounded-full px-5 shadow-sm">
+    <Button asChild variant={variant} size="sm" className="rounded-xl px-4 font-semibold text-xs h-9 cursor-pointer">
       <Link href={href}>{label}</Link>
     </Button>
   );
@@ -206,22 +206,14 @@ function ActionLink({
 function WorkspaceStat({
   label,
   value,
-  inverted = false,
 }: {
   label: string;
   value: string;
-  inverted?: boolean;
 }) {
   return (
-    <div
-      className={`rounded-2xl border px-4 py-3 ${
-        inverted ? "border-white/15 bg-white/10 text-white backdrop-blur-sm" : "border-slate-200 bg-white text-slate-950"
-      }`}
-    >
-      <div className={`text-[11px] uppercase tracking-[0.22em] ${inverted ? "text-white/60" : "text-slate-500"}`}>
-        {label}
-      </div>
-      <div className="mt-2 text-lg font-semibold tracking-tight">{value}</div>
+    <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-2.5 flex items-center justify-between">
+      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</span>
+      <span className="text-xs font-bold text-slate-800">{value}</span>
     </div>
   );
 }
@@ -594,29 +586,35 @@ export async function DashboardHomeShell() {
   const actionItems = getActionItems(data.profile.role);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(20,184,166,0.18),_transparent_28%),radial-gradient(circle_at_top_right,_rgba(59,130,246,0.14),_transparent_24%),linear-gradient(180deg,_#f8fafc_0%,_#eef2ff_40%,_#f8fafc_100%)] px-4 py-4 text-slate-950 sm:px-6 lg:px-8">
-      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1600px] gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-6">
+    <main className="min-h-screen w-full bg-slate-50/50 px-4 py-4 text-slate-900 sm:px-6 lg:px-8">
+      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1500px] gap-5 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-6">
         <NotificationToast />
+
+        {/* Sidebar Navigation */}
         <aside className="hidden lg:sticky lg:top-4 lg:block lg:h-[calc(100vh-2rem)]">
-          <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur">
-            <div className={`bg-gradient-to-br ${roleMeta.accent} p-5 text-white`}>
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-white/70">WorkKPI</p>
-                  <h1 className="mt-2 text-2xl font-semibold tracking-tight">{data.normalizeName(data.profile)}</h1>
+          <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
+            {/* Minimalist User Info */}
+            <div className="border-b border-slate-100 bg-slate-50/50 p-4.5">
+              <div className="flex items-center justify-between gap-2.5">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">WorkKPI</p>
+                  <h1 className="mt-1.5 text-base font-extrabold tracking-tight text-slate-950 truncate">
+                    {data.normalizeName(data.profile)}
+                  </h1>
                 </div>
-                <div className={`rounded-2xl border border-white/15 px-3 py-2 text-xs font-semibold ${roleMeta.badge} bg-white/10 text-white backdrop-blur-sm`}>
-                  {data.profile.role}
-                </div>
+                <span className="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-bold text-slate-700 uppercase shrink-0 border border-slate-200/30">
+                  {ROLE_LABELS[data.profile.role]}
+                </span>
               </div>
-              <p className="mt-3 text-sm leading-6 text-white/80">
+              <p className="mt-2.5 text-xs text-slate-500 font-medium truncate">
                 {data.profile.department?.name ?? "Chưa gán phòng"}
                 {data.profile.team?.name ? ` · ${data.profile.team.name}` : ""}
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">
-              <div className="grid gap-3">
+            {/* Sidebar Navigation Links */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-4">
+              <div className="grid gap-1">
                 {navItems.map((item) => (
                   <SidebarLink
                     key={item.href}
@@ -628,21 +626,18 @@ export async function DashboardHomeShell() {
                 ))}
               </div>
 
-              <div className="mt-5 grid gap-3 rounded-[1.5rem] border border-slate-200 bg-slate-50/80 p-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Today</p>
-                  <h2 className="mt-2 text-lg font-semibold text-slate-950">Phiên làm việc hiện tại</h2>
-                </div>
-                <div className="grid gap-3">
-                  <WorkspaceStat label="Unread" value={`${data.unreadCount > 99 ? "99+" : data.unreadCount}`} />
-                  <WorkspaceStat label="Active tasks" value={String(data.activeTasks.length)} />
-                  <WorkspaceStat label="Due today" value={String(data.dueToday.length)} />
-                </div>
+              {/* Minimal Today Widgets */}
+              <div className="grid gap-1.5 rounded-xl border border-slate-100 bg-slate-50/30 p-3">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-1">Hôm nay</p>
+                <WorkspaceStat label="Chưa đọc" value={`${data.unreadCount > 99 ? "99+" : data.unreadCount}`} />
+                <WorkspaceStat label="Đang chạy" value={String(data.activeTasks.length)} />
+                <WorkspaceStat label="Đến hạn" value={String(data.dueToday.length)} />
               </div>
 
-              <div className="mt-5 rounded-[1.5rem] border border-slate-200 bg-white p-4 shadow-sm">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Quick actions</p>
-                <div className="mt-4 grid gap-2">
+              {/* Minimalist Action Center */}
+              <div className="rounded-xl border border-slate-100 p-3 bg-white">
+                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Thao tác nhanh</p>
+                <div className="grid gap-1.5">
                   {actionItems.map((action) => (
                     <ActionLink key={action.href} href={action.href} label={action.label} variant={action.variant} />
                   ))}
@@ -652,94 +647,71 @@ export async function DashboardHomeShell() {
           </div>
         </aside>
 
-        <section className="flex min-w-0 flex-col gap-4 lg:gap-6">
-          <header className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white/90 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur">
-            <div className={`h-2 bg-gradient-to-r ${roleMeta.accent}`} />
-            <div className="p-4 sm:p-6 lg:p-7">
-              <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
-                <div className="max-w-3xl space-y-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-slate-600">
-                      {roleMeta.caption}
-                    </span>
-                    <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${roleMeta.badge}`}>
-                      {data.formatMonthLabel(data.now)}
-                    </span>
-                    <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
-                      {data.profile.department?.name ?? "No department"}
-                      {data.profile.team?.name ? ` · ${data.profile.team.name}` : ""}
-                    </span>
-                  </div>
-                  <div>
-                    <h2 className="text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
-                      {roleMeta.title}
-                    </h2>
-                    <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
-                      {roleMeta.description}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    <ActionLink href="/dashboard/tasks/new" label="Create work item" />
-                    <ActionLink href="/dashboard/tasks" label="Open tasks" variant="outline" />
-                    <ActionLink href="/dashboard/reports/monthly" label="View reports" variant="ghost" />
-                  </div>
-                </div>
+        {/* Main Content Workspace */}
+        <section className="flex min-w-0 flex-col gap-4 lg:gap-5">
+          {/* Top Horizontal Navigation Bar */}
+          <header className="flex h-14 items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white px-4.5 shadow-sm backdrop-blur-sm">
+            {/* Centered Global Search */}
+            <div className="w-full max-w-md">
+              <GlobalSearch />
+            </div>
 
-                <div className={`min-w-[280px] rounded-[1.75rem] bg-gradient-to-br ${roleMeta.accent} p-5 text-white shadow-[0_20px_70px_rgba(15,23,42,0.24)]`}>
-                  <p className="text-xs uppercase tracking-[0.22em] text-white/70">Workspace snapshot</p>
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <WorkspaceStat label="Unread" value={`${data.unreadCount > 99 ? "99+" : data.unreadCount}`} inverted />
-                    <WorkspaceStat
-                      label="KPI est."
-                      value={
-                        data.profile.role === "EMPLOYEE"
-                          ? `${data.employeeEstimate.totalScore.toFixed(1)}`
-                          : `${data.companyAvg?.toFixed(1) ?? "-"}`
-                      }
-                      inverted
-                    />
-                    <WorkspaceStat label="Due today" value={String(data.dueToday.length)} inverted />
-                    <WorkspaceStat label="Overdue" value={String(data.overdue.length)} inverted />
-                  </div>
-                  <div className="mt-4 rounded-2xl bg-white/10 p-4 text-sm leading-6 text-white/85 backdrop-blur-sm">
-                    {data.profile.role === "ADMIN"
-                      ? "Quản trị user, phòng ban và session từ một control center duy nhất."
-                      : data.profile.role === "DIRECTOR"
-                        ? "Điều hành bằng tín hiệu KPI và các điểm nghẽn đang ảnh hưởng đến hiệu suất công ty."
-                        : data.profile.role === "MANAGER"
-                          ? "Theo dõi team, ưu tiên task gần deadline và bóc tách rủi ro vận hành."
-                          : data.profile.role === "LEADER"
-                            ? "Nhìn được tiến độ team, thông báo và điểm cần review ngay trong phiên làm việc."
-                            : "Tập trung vào task cá nhân, thông báo và tiến độ trong ngày."}
-                  </div>
-                </div>
+            {/* Quick Actions & Profiles */}
+            <div className="flex items-center gap-3">
+              {/* Notifications bell */}
+              <NotificationBell initialUnreadCount={data.unreadCount} initialNotifications={data.notifications} />
+              
+              <div className="h-5 w-[1px] bg-slate-200" />
+              
+              {/* Active Month indicator */}
+              <div className="hidden sm:block rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-1.5 text-right shrink-0">
+                <div className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Tháng hiện tại</div>
+                <div className="text-[11px] font-bold text-slate-800 leading-tight">{data.formatMonthLabel(data.now)}</div>
               </div>
+
+              <div className="h-5 w-[1px] bg-slate-200 hidden sm:block" />
+
+              {/* Sign-out button */}
+              <SignOutButton />
             </div>
           </header>
 
-          <div className="rounded-[2rem] border border-slate-200 bg-white/80 p-4 shadow-[0_20px_70px_rgba(15,23,42,0.08)] sm:p-6 lg:p-7">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Command center</p>
-                <h3 className="mt-1 text-lg font-semibold text-slate-950">Tìm nhanh, thao tác nhanh, quay lại làm việc nhanh</h3>
+          {/* Clean Role Welcome Banner */}
+          <div className="rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-sm">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div className="max-w-3xl space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-600">
+                    {roleMeta.caption}
+                  </span>
+                  <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${roleMeta.badge}`}>
+                    {data.formatMonthLabel(data.now)}
+                  </span>
+                  <span className="rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5 text-[9px] font-semibold text-slate-500">
+                    {data.profile.department?.name ?? "Không thuộc phòng ban"}
+                    {data.profile.team?.name ? ` · ${data.profile.team.name}` : ""}
+                  </span>
+                </div>
+                <div>
+                  <h2 className="text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">
+                    {roleMeta.title}
+                  </h2>
+                  <p className="mt-1 text-xs sm:text-sm text-slate-500 leading-relaxed max-w-2xl">
+                    {roleMeta.description}
+                  </p>
+                </div>
               </div>
-              <div className="w-full sm:max-w-xl">
-                <GlobalSearch />
-              </div>
-            </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-4">
-              <div className="flex flex-wrap items-center gap-3">
-                <NotificationBell initialUnreadCount={data.unreadCount} initialNotifications={data.notifications} />
-                <SignOutButton />
-              </div>
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-right">
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">KPI tháng hiện tại</div>
-                <div className="text-lg font-semibold text-slate-950">{data.formatMonthLabel(data.now)}</div>
+              {/* Inline Action Buttons */}
+              <div className="flex flex-wrap gap-2 shrink-0">
+                <ActionLink href="/dashboard/tasks/new" label="Tạo công việc" />
+                <ActionLink href="/dashboard/tasks" label="Mở danh sách Tasks" variant="outline" />
+                <ActionLink href="/dashboard/reports/monthly" label="Xem báo cáo" variant="ghost" />
               </div>
             </div>
           </div>
 
+          {/* Active Data Dashboard Area */}
           <DashboardView
             role={data.profile.role}
             profileName={data.normalizeName(data.profile)}
@@ -818,3 +790,11 @@ export async function DashboardHomeShell() {
     </main>
   );
 }
+
+const ROLE_LABELS: Record<DashboardRole, string> = {
+  EMPLOYEE: "Nhân viên",
+  LEADER: "Leader",
+  MANAGER: "Trưởng phòng",
+  DIRECTOR: "Ban giám đốc",
+  ADMIN: "Quản trị viên",
+};
