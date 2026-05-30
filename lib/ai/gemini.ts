@@ -38,11 +38,11 @@ export async function generateGeminiReply({ systemInstruction, contents }: Gemin
   }
 
   try {
-    const response = await fetch(`${getBaseUrl()}/models/${encodeURIComponent(getModel())}:generateContent`, {
+    const url = `${getBaseUrl()}/models/${encodeURIComponent(getModel())}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-goog-api-key": apiKey,
       },
       body: JSON.stringify({
         systemInstruction: {
@@ -57,6 +57,13 @@ export async function generateGeminiReply({ systemInstruction, contents }: Gemin
     });
 
     if (!response.ok) {
+      let errBody: unknown;
+      try { errBody = await response.json(); } catch { errBody = null; }
+      // eslint-disable-next-line no-console
+      console.error(
+        `[gemini] API error ${response.status} for model ${getModel()}:`,
+        JSON.stringify(errBody)
+      );
       return {
         error: "Không thể kết nối tới dịch vụ AI.",
         code: "ERR_AI_PROVIDER",
