@@ -135,7 +135,7 @@ function getNavItems(role: DashboardRole) {
 
 function getActionItems(role: DashboardRole) {
   const actions: { href: string; label: string; variant?: "default" | "outline" | "ghost" }[] = [
-    { href: "/dashboard/tasks/new", label: "Tạo việc mới" },
+    // { href: "/dashboard/tasks/new", label: "Tạo việc mới" },
     { href: "/dashboard/notifications", label: "Mở hộp thư", variant: "outline" },
   ];
 
