@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { SubmitReviewForm } from "@/components/tasks/submit-review-form";
 import { TaskCard, type TaskCardData } from "@/components/tasks/task-card";
 import { Button } from "@/components/ui/button";
 import { KANBAN_COLUMNS, STATUS_LABELS } from "@/lib/tasks/constants";
@@ -20,6 +21,7 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
   const [pendingReason, setPendingReason] = useState("");
   const [pendingError, setPendingError] = useState<string | null>(null);
   const [pendingLoading, setPendingLoading] = useState(false);
+  const [reviewTaskId, setReviewTaskId] = useState<string | null>(null);
 
   const loadTasks = useCallback(async () => {
     setLoading(true);
@@ -53,6 +55,12 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
 
     if (status === "PENDING") {
       setPendingTaskId(taskId);
+      setDraggingId(null);
+      return;
+    }
+
+    if (status === "REVIEW") {
+      setReviewTaskId(taskId);
       setDraggingId(null);
       return;
     }
@@ -188,6 +196,27 @@ export function KanbanBoard({ canCreate }: KanbanBoardProps) {
                 Xác nhận
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {reviewTaskId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+            <SubmitReviewForm
+              taskId={reviewTaskId}
+              hasAttachments={false}
+              defaultOpen={true}
+              onCancel={() => {
+                setReviewTaskId(null);
+              }}
+              onSuccess={() => {
+                setTasks((prev) =>
+                  prev.map((t) => (t.id === reviewTaskId ? { ...t, status: "REVIEW" } : t))
+                );
+                setReviewTaskId(null);
+              }}
+            />
           </div>
         </div>
       )}

@@ -52,6 +52,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       .upload(storagePath, file, { contentType: file.type, upsert: false });
 
     if (upload.error) {
+      console.error("Supabase upload error details:", upload.error);
       return taskError("Không thể tải file lên.", "ERR_UPLOAD", 500);
     }
 

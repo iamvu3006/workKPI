@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { SubmitReviewForm } from "@/components/tasks/submit-review-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MIN_EXTEND_REASON_LENGTH, MIN_REJECT_REASON_LENGTH } from "@/lib/tasks/constants";
@@ -10,10 +11,17 @@ interface TaskActionsProps {
   taskId: string;
   status: string;
   isAssignee: boolean;
+  hasAttachments: boolean;
   onUpdated?: () => void;
 }
 
-export function TaskActions({ taskId, status, isAssignee, onUpdated }: TaskActionsProps) {
+export function TaskActions({
+  taskId,
+  status,
+  isAssignee,
+  hasAttachments,
+  onUpdated,
+}: TaskActionsProps) {
   const [rejectReason, setRejectReason] = useState("");
   const [extendReason, setExtendReason] = useState("");
   const [proposedDeadline, setProposedDeadline] = useState("");
@@ -80,9 +88,12 @@ export function TaskActions({ taskId, status, isAssignee, onUpdated }: TaskActio
           }}>
             Báo Pending
           </Button>
-          <Button size="sm" onClick={() => updateStatus("REVIEW")}>
-            Nộp Review
-          </Button>
+
+          <SubmitReviewForm
+            taskId={taskId}
+            hasAttachments={hasAttachments}
+            onSuccess={onUpdated}
+          />
         </>
       )}
       {status === "PENDING" && (

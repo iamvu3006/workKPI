@@ -96,6 +96,7 @@ export function TaskDetail({ taskId, currentUserId, canEdit }: TaskDetailProps) 
         taskId={taskId}
         status={status}
         isAssignee={isAssignee}
+        hasAttachments={attachments.length > 0}
         onUpdated={() => {
           load();
           router.refresh();

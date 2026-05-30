@@ -10,6 +10,8 @@ interface SubmitReviewFormProps {
   taskId: string;
   hasAttachments: boolean;
   onSuccess?: () => void;
+  onCancel?: () => void;
+  defaultOpen?: boolean;
 }
 
 const defaultSelf: SelfAssessmentValues = {
@@ -19,8 +21,14 @@ const defaultSelf: SelfAssessmentValues = {
   comment: "",
 };
 
-export function SubmitReviewForm({ taskId, hasAttachments, onSuccess }: SubmitReviewFormProps) {
-  const [open, setOpen] = useState(false);
+export function SubmitReviewForm({
+  taskId,
+  hasAttachments,
+  onSuccess,
+  onCancel,
+  defaultOpen = false,
+}: SubmitReviewFormProps) {
+  const [open, setOpen] = useState(defaultOpen);
   const [summary, setSummary] = useState("");
   const [evidenceNote, setEvidenceNote] = useState("");
   const [selfAssessment, setSelfAssessment] = useState<SelfAssessmentValues>(defaultSelf);
@@ -87,7 +95,17 @@ export function SubmitReviewForm({ taskId, hasAttachments, onSuccess }: SubmitRe
         <Button onClick={submit} disabled={loading}>
           {loading ? "Đang gửi..." : "Gửi nghiệm thu"}
         </Button>
-        <Button variant="outline" onClick={() => setOpen(false)} disabled={loading}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            if (onCancel) {
+              onCancel();
+            } else {
+              setOpen(false);
+            }
+          }}
+          disabled={loading}
+        >
           Hủy
         </Button>
       </div>
