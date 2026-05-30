@@ -72,6 +72,8 @@ npm install
 DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<db>?schema=public"
 NEXT_PUBLIC_SUPABASE_URL="https://<project-ref>.supabase.co"
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="<your-supabase-anon-or-publishable-key>"
+GEMINI_API_KEY="<google-gemini-api-key>"
+GEMINI_MODEL="gemini-3.5-flash"
 ```
 
 3. (Khuyen nghi) Dong bo Prisma client:

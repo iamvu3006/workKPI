@@ -4,9 +4,14 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { Input } from "@/components/ui/input";
-import { TaskFilter } from "@/components/tasks/task-filter";
 
-import type { TaskFilterValue } from "@/components/tasks/task-filter";
+type TaskFilterValue = {
+  status: string;
+  priority: string;
+  tag: string;
+  from: string;
+  to: string;
+};
 
 type TaskSearchItem = {
   id: string;
@@ -128,7 +133,7 @@ export function TaskSearch() {
         />
       </div>
 
-      <TaskFilter value={filters} onChange={handleFilterChange} />
+      {/* TaskFilter removed: the larger filter below provides full filtering controls */}
 
       {q.trim().length > 0 && q.trim().length < 3 && (
         <p className="mt-3 text-sm text-slate-500">Cần ít nhất 3 ký tự để bắt đầu tìm kiếm.</p>

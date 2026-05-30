@@ -87,6 +87,7 @@ function getNavItems(role: DashboardRole) {
     { href: "/dashboard", label: "Tổng quan", description: "Bảng điều khiển chính" },
     { href: "/dashboard/tasks", label: "Công việc", description: "Danh sách và luồng xử lý" },
     { href: "/dashboard/notifications", label: "Thông báo", description: "Tín hiệu hoạt động" },
+    { href: "/dashboard/ai", label: "Trợ lý AI", description: "Hỏi đáp và trợ giúp công việc" },
     { href: "/dashboard/profile", label: "Cá nhân", description: "Hồ sơ của bạn" },
   ];
 
@@ -707,6 +708,7 @@ export async function DashboardHomeShell() {
                 <ActionLink href="/dashboard/tasks/new" label="Tạo công việc" />
                 <ActionLink href="/dashboard/tasks" label="Mở danh sách Tasks" variant="outline" />
                 <ActionLink href="/dashboard/reports/monthly" label="Xem báo cáo" variant="ghost" />
+                <ActionLink href="/dashboard/ai" label="Trợ lý AI" variant="ghost" />
               </div>
             </div>
           </div>
