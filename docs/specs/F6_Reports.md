@@ -12,6 +12,13 @@
 
 ## User Flow
 
+### 0. Điều hướng theo vai trò
+Vào /dashboard/reports:
+- EMPLOYEE → chuyển tới /dashboard/reports/weekly (tiến độ cá nhân theo tuần)
+- LEADER → chuyển tới /dashboard/reports/weekly (tiến độ team theo tuần)
+- MANAGER → chuyển tới /dashboard/reports/monthly (báo cáo phòng ban)
+- DIRECTOR / ADMIN → chuyển tới /dashboard/reports/company (báo cáo toàn công ty)
+
 ### 1. Báo cáo Tháng — Trưởng phòng
 Vào `/dashboard/reports/monthly` → chọn tháng/năm → hệ thống hiển thị:
 - Tóm tắt: tổng task / đã hoàn thành / trễ hạn / bị hủy
@@ -21,21 +28,24 @@ Vào `/dashboard/reports/monthly` → chọn tháng/năm → hệ thống hiển
 → Nút Export Excel → tải file.
 
 ### 2. Báo cáo KPI Toàn công ty — BGĐ
-Vào `/dashboard/reports/company` → chọn tháng hoặc quý → biểu đồ cột KPI từng phòng →
-bảng xếp hạng phòng → Top 5 nhân viên toàn công ty → tỷ lệ task đúng hạn toàn công ty.
+Vào /dashboard/reports/company → chọn tháng / quý / năm → biểu đồ cột KPI từng phòng →
+bảng xếp hạng phòng → Top 20 nhân viên toàn công ty → tỷ lệ task đúng hạn toàn công ty.
+→ Nút Export Excel → tải file theo kỳ hiện tại.
 
 ### 3. Báo cáo Tiến độ Task theo Tuần
-Widget trên dashboard Trưởng phòng hoặc trang `/dashboard/reports/weekly` → biểu đồ số task
-DONE / IN_PROGRESS / PENDING theo tuần → tỷ lệ hoàn thành đúng hạn → so sánh với tuần trước.
+EMPLOYEE vào /dashboard/reports/weekly → xem tiến độ task cá nhân theo tuần.
+LEADER vào /dashboard/reports/weekly → xem tiến độ task của team theo tuần.
+Hiển thị biểu đồ số task DONE / IN_PROGRESS / PENDING / REVIEW theo tuần → tỷ lệ hoàn thành đúng hạn → so sánh với tuần trước.
 
 ---
 
 ## Business Rules
 
 - **Phân quyền xem báo cáo:**
-  - MANAGER: xem báo cáo của phòng mình.
-  - DIRECTOR / ADMIN: xem tất cả phòng và toàn công ty.
-  - EMPLOYEE / LEADER: không có quyền truy cập trang báo cáo.
+  - EMPLOYEE: xem báo cáo tiến độ cá nhân theo tuần.
+  - LEADER: xem báo cáo tiến độ theo team (tuần).
+  - MANAGER: xem báo cáo phòng ban của phòng mình (tháng / quý / năm).
+  - DIRECTOR / ADMIN: xem báo cáo toàn công ty (tháng / quý / năm).
 - **Dữ liệu báo cáo tháng** lấy từ kết quả KPI đã được tính (cần chạy tính KPI trước). Nếu
   KPI tháng chưa được tính → hiện banner cảnh báo "KPI tháng này chưa được tính. Liên hệ admin."
 - **Export Excel:** Xuất theo bộ lọc hiện tại (tháng, phòng ban). Tối đa 10.000 dòng/lần export.
@@ -61,10 +71,10 @@ DONE / IN_PROGRESS / PENDING theo tuần → tỷ lệ hoàn thành đúng hạn
 
 | Method | Endpoint | Params | Response |
 |--------|----------|--------|----------|
-| GET | `/api/reports/monthly` | `?departmentId&month&year` | `MonthlyReport` |
-| GET | `/api/reports/weekly` | `?departmentId&weekStart` | `WeeklyReport` |
-| GET | `/api/reports/company-kpi` | `?month&year` | `CompanyKpiReport` |
-| GET | `/api/reports/export` | `?type=monthly&departmentId&month&year` | `File (xlsx)` |
+| GET | /api/reports/monthly | ?departmentId&month&year&period | MonthlyReport |
+| GET | /api/reports/weekly | ?weekStart | WeeklyReport |
+| GET | /api/reports/company-kpi | ?month&year&period | CompanyKpiReport |
+| GET | /api/reports/export | ?type=monthly&departmentId&month&year | File (xlsx) |
 
 **MonthlyReport shape:**
 ```ts
@@ -110,7 +120,9 @@ DONE / IN_PROGRESS / PENDING theo tuần → tỷ lệ hoàn thành đúng hạn
 
 ## DO NOT
 
-- **KHÔNG** cho EMPLOYEE hoặc LEADER xem trang báo cáo.
+- **KHÔNG** cho EMPLOYEE xem dữ liệu team/phòng/công ty.
+- **KHÔNG** cho LEADER xem dữ liệu ngoài team.
+- **KHÔNG** cho MANAGER xem dữ liệu phòng ban khác.
 - **KHÔNG** export quá 10.000 dòng một lần mà không có cảnh báo.
 - **KHÔNG** hiển thị KPI của nhân viên phòng khác trong báo cáo của Trưởng phòng.
 - **KHÔNG** implement báo cáo tự động gửi email, custom report builder, hoặc PPTX export

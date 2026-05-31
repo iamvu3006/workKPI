@@ -1,22 +1,69 @@
 import React from "react";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import CompanyKpiComponent from "@/components/reports/company-kpi-report";
+import { prisma } from "@/lib/db/prisma";
+import { createClient } from "@/utils/supabase/server";
 
-type Props = { searchParams?: { month?: string; year?: string } };
+type ReportSearchParams = { month?: string; year?: string; period?: string };
+type Props = { searchParams?: Promise<ReportSearchParams> | ReportSearchParams };
+
+function resolvePeriod(period?: string) {
+  return period === "quarter" || period === "year" ? period : "month";
+}
 
 export default async function Page({ searchParams }: Props) {
-  const month = Number(searchParams?.month ?? new Date().getMonth() + 1);
-  const year = Number(searchParams?.year ?? new Date().getFullYear());
+  const params = (await Promise.resolve(searchParams)) ?? {};
 
-  const q = new URLSearchParams({ month: String(month), year: String(year) });
+  const cookieStore = await cookies();
+  const supabase = createClient(cookieStore);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/auth/login");
+  }
+
+  const profile = await prisma.profile.findUnique({
+    where: { id: user.id },
+    select: { role: true },
+  });
+
+  if (!profile) {
+    redirect("/auth/login");
+  }
+
+  if (profile.role === "EMPLOYEE" || profile.role === "LEADER") {
+    redirect("/dashboard/reports/weekly");
+  }
+
+  if (profile.role === "MANAGER") {
+    redirect("/dashboard/reports/monthly");
+  }
+
+  if (profile.role !== "DIRECTOR" && profile.role !== "ADMIN") {
+    redirect("/dashboard");
+  }
+
+  const month = Number(params.month ?? new Date().getMonth() + 1);
+  const year = Number(params.year ?? new Date().getFullYear());
+  const period = resolvePeriod(params.period);
+
+  const q = new URLSearchParams({ month: String(month), year: String(year), period });
   const requestHeaders = await headers();
   const forwardedProto = requestHeaders.get("x-forwarded-proto") ?? "http";
   const host = requestHeaders.get("host");
+  const cookie = requestHeaders.get("cookie") ?? "";
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || (host ? `${forwardedProto}://${host}` : "http://localhost:3000");
 
-  const res = await fetch(`${baseUrl}/api/reports/company-kpi?${q.toString()}`, { cache: "no-store" });
+  const res = await fetch(`${baseUrl}/api/reports/company-kpi?${q.toString()}`, {
+    cache: "no-store",
+    headers: cookie ? { Cookie: cookie } : undefined,
+  });
   const payload = await res.json();
+  const basePeriodQuery = `month=${month}&year=${year}`;
 
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8">
@@ -30,7 +77,31 @@ export default async function Page({ searchParams }: Props) {
             ← Dashboard
           </Link>
         </header>
-        <CompanyKpiComponent data={payload?.success ? payload.data : null} error={payload?.success ? null : payload?.error ?? "Không thể tải báo cáo"} />
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/dashboard/reports/company?${basePeriodQuery}&period=month`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${period === "month" ? "bg-teal-600 text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+          >
+            Tháng
+          </Link>
+          <Link
+            href={`/dashboard/reports/company?${basePeriodQuery}&period=quarter`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${period === "quarter" ? "bg-teal-600 text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+          >
+            Quý
+          </Link>
+          <Link
+            href={`/dashboard/reports/company?${basePeriodQuery}&period=year`}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${period === "year" ? "bg-teal-600 text-white" : "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"}`}
+          >
+            Năm
+          </Link>
+        </div>
+        <CompanyKpiComponent
+          data={payload?.success ? payload.data : null}
+          error={payload?.success ? null : payload?.error ?? "Không thể tải báo cáo"}
+          exportUrl={`/api/reports/export?type=company&month=${month}&year=${year}&period=${period}`}
+        />
       </div>
     </main>
   );

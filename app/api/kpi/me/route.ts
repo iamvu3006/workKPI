@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db/prisma";
 import { getKpiActor } from "@/lib/kpi/auth";
 import { GRADE_LABELS } from "@/lib/kpi/grades";
 import { parseMonthYear } from "@/lib/kpi/month-range";
+import { normalizeTaskBreakdown } from "@/lib/kpi/task-breakdown";
 import { taskError, taskSuccess } from "@/lib/tasks/api-response";
 
 export async function GET(request: NextRequest) {
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
       totalScore: record.totalScore,
       grade: record.grade,
       gradeLabel: GRADE_LABELS[record.grade],
-      taskBreakdown: record.taskBreakdown,
+      taskBreakdown: normalizeTaskBreakdown(record.taskBreakdown),
       onTimeRate: record.onTimeRate,
       calculatedAt: record.calculatedAt,
       history: history.map((h) => ({

@@ -8,6 +8,8 @@ export async function GET(req: Request) {
     const params = url.searchParams;
     const month = Number(params.get("month"));
     const year = Number(params.get("year"));
+    const periodParam = params.get("period");
+    const period = periodParam === "quarter" || periodParam === "year" ? periodParam : "month";
 
     if (!month || !year) return NextResponse.json({ success: false, error: "Thiếu month/year" }, { status: 400 });
 
@@ -19,7 +21,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: false, error: "Không có quyền xem báo cáo toàn công ty." }, { status: 403 });
     }
 
-    const report = await getCompanyKpi({ month, year });
+    const report = await getCompanyKpi({ month, year, period });
 
     return NextResponse.json({ success: true, data: report, message: "Thành công" });
   } catch (err) {

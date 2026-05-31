@@ -1,10 +1,10 @@
 import React from "react";
 
-export default function WeeklyProgressReport({ data, error }: { data: any; error?: string | null }) {
+export default function WeeklyProgressReport({ data, error, exportUrl }: { data: any; error?: string | null; exportUrl?: string | null }) {
   if (error) {
     return (
       <section className="space-y-4">
-        <h2 className="text-base font-semibold text-slate-900">Báo cáo Tiến độ Task theo Tuần</h2>
+        <h2 className="text-base font-semibold text-slate-900">Báo cáo tiến độ</h2>
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
           <p className="text-sm text-rose-700">{error}</p>
         </div>
@@ -15,9 +15,9 @@ export default function WeeklyProgressReport({ data, error }: { data: any; error
   if (!data) {
     return (
       <section className="space-y-4">
-        <h2 className="text-base font-semibold text-slate-900">Báo cáo Tiến độ Task theo Tuần</h2>
+        <h2 className="text-base font-semibold text-slate-900">Báo cáo tiến độ</h2>
         <div className="rounded-xl border border-dashed border-slate-300 bg-white py-12 text-center">
-          <p className="text-sm text-slate-500">Chưa có dữ liệu cho tuần này.</p>
+          <p className="text-sm text-slate-500">Chưa có dữ liệu cho kỳ này.</p>
         </div>
       </section>
     );
@@ -34,13 +34,20 @@ export default function WeeklyProgressReport({ data, error }: { data: any; error
 
   return (
     <section className="space-y-6">
-      <div>
-        <p className="text-sm text-slate-600">{new Date(data.weekStart).toLocaleDateString()} - {new Date(data.weekEnd).toLocaleDateString()}</p>
-        <p className="mt-1 text-sm text-slate-600">Tỷ lệ hoàn thành đúng hạn: {data.onTimeRate ?? 0}%</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-sm text-slate-600">{data.periodLabel ?? `${new Date(data.weekStart).toLocaleDateString()} - ${new Date(data.weekEnd).toLocaleDateString()}`}</p>
+          <p className="mt-1 text-sm text-slate-600">Tỷ lệ hoàn thành đúng hạn: {data.onTimeRate ?? 0}%</p>
+        </div>
+        {exportUrl ? (
+          <a href={exportUrl} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
+            Export Excel
+          </a>
+        ) : null}
       </div>
 
       <div>
-        <h3 className="text-base font-semibold text-slate-900">Biểu đồ trạng thái theo tuần</h3>
+        <h3 className="text-base font-semibold text-slate-900">Biểu đồ trạng thái theo kỳ</h3>
         <div className="space-y-3 mt-3">
           {rows.map((r) => (
             <div key={r.label} className="flex items-center gap-3">

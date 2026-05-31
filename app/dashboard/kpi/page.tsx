@@ -1,10 +1,13 @@
 import { cookies } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { KpiBreakdownTable } from "@/components/kpi/kpi-breakdown-table";
 import { KpiPersonalCard } from "@/components/kpi/kpi-personal-card";
 import { KpiTrendChart } from "@/components/kpi/kpi-trend-chart";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { normalizeTaskBreakdown } from "@/lib/kpi/task-breakdown";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function KpiPage() {
@@ -55,6 +58,8 @@ export default async function KpiPage() {
     error = "Lỗi kết nối tới server";
   }
 
+  const taskBreakdown = currentKpi ? normalizeTaskBreakdown(currentKpi.taskBreakdown) : [];
+
   // Fetch trend data (last 6 months)
   try {
     const promises = [];
@@ -79,7 +84,7 @@ export default async function KpiPage() {
 
     const results = await Promise.all(promises);
     trendData = results
-      .filter((r) => r && r.success && r.data)
+      .filter((r) => r && r.success && r.data && typeof r.data.totalScore === "number")
       .map((r) => ({
         month: r.data.month,
         year: r.data.year,
@@ -92,10 +97,18 @@ export default async function KpiPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-6 py-8">
       <div className="mx-auto max-w-4xl">
-        <h1 className="text-3xl font-bold text-slate-900">KPI Của bạn</h1>
-        <p className="mt-2 text-slate-600">
-          Tháng {currentMonth} / {currentYear}
-        </p>
+        <header className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-teal-700">KPI</p>
+            <h1 className="mt-1 text-3xl font-bold text-slate-900">KPI Của bạn</h1>
+            <p className="mt-2 text-slate-600">
+              Tháng {currentMonth} / {currentYear}
+            </p>
+          </div>
+          <Button asChild variant="outline">
+            <Link href="/dashboard">← Quay lại Dashboard</Link>
+          </Button>
+        </header>
 
         {error && (
           <Card className="mt-6 border-red-200 bg-red-50 p-4">
@@ -120,17 +133,15 @@ export default async function KpiPage() {
 
             {/* Breakdown table */}
             <KpiBreakdownTable
-              tasks={
-                (currentKpi.taskBreakdown as any[])?.map((t: any) => ({
-                  taskId: t.taskId,
-                  taskTitle: t.taskTitle,
-                  weight: t.weight,
-                  progress: t.progress,
-                  qualityScore: t.qualityScore,
-                  contribution: t.contribution,
-                  penaltyDays: t.penaltyDays,
-                })) || []
-              }
+              tasks={taskBreakdown.map((t) => ({
+                taskId: t.taskId,
+                taskTitle: t.taskTitle,
+                weight: t.weight,
+                progress: t.progress,
+                qualityScore: t.qualityScore,
+                contribution: t.contribution,
+                penaltyDays: t.penaltyDays,
+              }))}
             />
 
             {/* Trend chart */}

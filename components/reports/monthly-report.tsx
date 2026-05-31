@@ -4,7 +4,7 @@ export default function MonthlyReportComponent({ report, error }: { report: any;
   if (error) {
     return (
       <section className="space-y-4">
-        <h2 className="text-base font-semibold text-slate-900">Báo cáo Tháng</h2>
+        <h2 className="text-base font-semibold text-slate-900">Báo cáo phòng ban</h2>
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
           <p className="text-sm text-rose-700">{error}</p>
         </div>
@@ -15,9 +15,9 @@ export default function MonthlyReportComponent({ report, error }: { report: any;
   if (!report) {
     return (
       <section className="space-y-4">
-        <h2 className="text-base font-semibold text-slate-900">Báo cáo Tháng</h2>
+        <h2 className="text-base font-semibold text-slate-900">Báo cáo phòng ban</h2>
         <div className="rounded-xl border border-dashed border-slate-300 bg-white py-12 text-center">
-          <p className="text-sm text-slate-500">Chưa có dữ liệu cho tháng này.</p>
+          <p className="text-sm text-slate-500">Chưa có dữ liệu cho kỳ này.</p>
         </div>
       </section>
     );
@@ -25,6 +25,7 @@ export default function MonthlyReportComponent({ report, error }: { report: any;
 
   const members = Array.isArray(report.members) ? report.members : [];
   const exportDisabled = report.kpiCalculated === false;
+  const exportUrl = `/api/reports/export?type=monthly&month=${report.month}&year=${report.year}${report.period ? `&period=${report.period}` : ""}${report.department?.id ? `&departmentId=${report.department.id}` : ""}`;
 
   return (
     <section className="space-y-6">
@@ -36,15 +37,15 @@ export default function MonthlyReportComponent({ report, error }: { report: any;
 
       <div className="flex items-start justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">{report.department?.name ?? "Toàn công ty"} — {report.month}/{report.year}</h3>
+          <h3 className="text-base font-semibold text-slate-900">{report.department?.name ?? "Toàn công ty"} — {report.periodLabel ?? `${report.month}/${report.year}`}</h3>
           <p className="mt-1 text-sm text-slate-600">Avg KPI: {report.avgKpiScore ?? "N/A"}</p>
-          <p className="mt-1 text-sm text-slate-600">So với tháng trước: {typeof report.comparedToPrevMonth === "number" ? `${report.comparedToPrevMonth >= 0 ? "+" : ""}${report.comparedToPrevMonth}` : "N/A"}</p>
+          <p className="mt-1 text-sm text-slate-600">So với kỳ trước: {typeof report.comparedToPrevMonth === "number" ? `${report.comparedToPrevMonth >= 0 ? "+" : ""}${report.comparedToPrevMonth}` : "N/A"}</p>
         </div>
         <div>
           {exportDisabled ? (
             <span aria-disabled="true" className="rounded-lg px-3 py-2 text-sm font-medium text-slate-700 opacity-50">Export Excel</span>
           ) : (
-            <a href={`/api/reports/export?type=monthly&month=${report.month}&year=${report.year}${report.department?.id ? `&departmentId=${report.department.id}` : ""}`} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">Export Excel</a>
+            <a href={exportUrl} className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">Export Excel</a>
           )}
         </div>
       </div>

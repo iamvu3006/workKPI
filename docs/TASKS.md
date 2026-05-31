@@ -394,7 +394,7 @@ Mỗi task được thiết kế để hoàn thành trong **tối đa 2 giờ**.
 ---
 
 ## Milestone 8: Báo cáo (F6)
-*Mục tiêu: Báo cáo tháng/quý cho Trưởng phòng và BGĐ, export Excel.*
+*Mục tiêu: Báo cáo theo vai trò (tuần/tháng/quý/năm) và export Excel theo phạm vi MVP.*
 
 - [x] **Báo cáo Tháng — Trưởng phòng:** Tóm tắt tổng task / hoàn thành / trễ hạn, KPI trung bình
   phòng và từng nhân viên, so sánh với tháng trước, highlight xuất sắc và cần cải thiện.
@@ -403,20 +403,28 @@ Mỗi task được thiết kế để hoàn thành trong **tối đa 2 giờ**.
     - ✅ Completed: API route có phân trang server-side, UI có empty/error state + summary cards + so sánh tháng trước, banner KPI chưa tính và export disable theo spec.
 
 - [x] **Báo cáo KPI Toàn công ty — BGĐ:** KPI trung bình từng phòng, xếp hạng phòng, biểu đồ so
-  sánh, Top 5 nhân viên xuất sắc, tỷ lệ hoàn thành đúng hạn.
+  sánh, Top 20 nhân viên xuất sắc, tỷ lệ hoàn thành đúng hạn.
     - *Files:* `app/dashboard/reports/company/page.tsx`, `components/reports/company-kpi-report.tsx`,
       `app/api/reports/company-kpi/route.ts`
-    - ✅ Completed: API route đã có RBAC, UI có xếp hạng phòng + Top 5 nhân viên + tỷ lệ đúng hạn, kèm biểu đồ so sánh cơ bản.
+    - ✅ Completed: API route có RBAC cho DIRECTOR/ADMIN, UI có xếp hạng phòng + Top 20 nhân viên + export Excel + tỷ lệ đúng hạn, hỗ trợ kỳ tháng/quý/năm.
 
 - [x] **Báo cáo Tiến độ Task theo Tuần:** Task Done / In Progress / Pending theo tuần, tỷ lệ hoàn
   thành đúng hạn, so sánh tuần trước.
     - *Files:* `components/reports/weekly-progress-report.tsx`, `app/api/reports/weekly/route.ts`, `app/dashboard/reports/weekly/page.tsx`
-    - ✅ Completed: API route + UI trang tuần đã có, hiển thị trạng thái, tỷ lệ đúng hạn và so sánh tuần trước theo snapshot dữ liệu hiện tại.
+  - ✅ Completed: API route + UI trang tuần đã có, EMPLOYEE xem tiến độ cá nhân, LEADER xem tiến độ team, hiển thị trạng thái + tỷ lệ đúng hạn + so sánh tuần trước.
+
+- [x] **Điều hướng Báo cáo theo Vai trò:** Vào `/dashboard/reports` sẽ tự chuyển đúng trang theo role.
+  - *Files:* `app/dashboard/reports/page.tsx`, `components/dashboard/dashboard-home.tsx`, `app/dashboard/reports/monthly/page.tsx`, `app/dashboard/reports/weekly/page.tsx`, `app/dashboard/reports/company/page.tsx`
+  - ✅ Completed: Role-aware routing: EMPLOYEE/LEADER → weekly, MANAGER → monthly, DIRECTOR/ADMIN → company.
+
+- [x] **Hỗ trợ Kỳ Báo cáo:** Thêm chọn kỳ tuần/tháng/quý/năm theo vai trò và phạm vi dữ liệu.
+  - *Files:* `lib/reports/index.ts`, `app/api/reports/monthly/route.ts`, `app/api/reports/company-kpi/route.ts`, `components/reports/monthly-report.tsx`, `components/reports/company-kpi-report.tsx`
+  - ✅ Completed: Monthly và Company hỗ trợ month/quarter/year; Weekly dùng weekStart cho EMPLOYEE/LEADER.
 
 - [x] **Export Báo cáo ra Excel:** Nút export trên trang báo cáo, xuất theo bộ lọc hiện tại,
   format bảng với header, tên file tự động theo tháng/phòng.
     - *Files:* `lib/export/excel-report.ts`, `app/api/reports/export/route.ts`
-    - ✅ Completed: XLSX export theo batch/paged queries, có CSV fallback và chặn >10.000 dòng.
+    - ✅ Completed: XLSX export theo batch/paged queries, có CSV fallback và chặn >10.000 dòng; báo cáo phòng ban export chỉ ở kỳ tháng, báo cáo toàn công ty export theo tháng / quý / năm.
 
 - **Status:** Completed — Milestone 8 đã hoàn tất theo phạm vi MVP.
   

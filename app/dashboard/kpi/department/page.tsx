@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { prisma } from "@/lib/db/prisma";
+import { countTaskBreakdownItems } from "@/lib/kpi/task-breakdown";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function KpiDepartmentPage() {
@@ -55,7 +56,8 @@ export default async function KpiDepartmentPage() {
     if (res.ok) {
       const json = await res.json();
       if (json.success) {
-        departmentData = json.data || [];
+        // API returns an object with `members` inside data
+        departmentData = json.data?.members || [];
 
         // Get department name
         if (profile.departmentId) {
@@ -110,6 +112,7 @@ export default async function KpiDepartmentPage() {
             <Card className="border-slate-200 bg-white p-6">
               <h2 className="text-lg font-semibold text-slate-900">Tóm tắt Phòng ban</h2>
               <div className="mt-6 grid grid-cols-3 gap-4">
+                  {/* Summary: use only scored members for averages */}
                   <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
                     <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Nhân viên</p>
                     <p className="mt-2 text-3xl font-bold text-slate-900">{departmentData.length}</p>
@@ -117,20 +120,25 @@ export default async function KpiDepartmentPage() {
                   <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
                     <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Điểm TB</p>
                     <p className="mt-2 text-3xl font-bold text-slate-900">
-                      {(
-                        departmentData.reduce((sum: number, row: any) => sum + row.totalScore, 0) /
-                        departmentData.length
-                      ).toFixed(1)}
+                      {(() => {
+                        const scored = departmentData.filter((r: any) => r.totalScore != null);
+                        const avg = scored.length
+                          ? scored.reduce((sum: number, row: any) => sum + (row.totalScore || 0), 0) / scored.length
+                          : 0;
+                        return avg.toFixed(1);
+                      })()}
                     </p>
                   </div>
                   <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
                     <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Đúng hạn TB</p>
                     <p className="mt-2 text-3xl font-bold text-slate-900">
-                      {(
-                        departmentData.reduce((sum: number, row: any) => sum + row.onTimeRate, 0) /
-                        departmentData.length
-                      ).toFixed(0)}
-                    %
+                      {(() => {
+                        const scored = departmentData.filter((r: any) => r.totalScore != null && r.onTimeRate != null);
+                        const avg = scored.length
+                          ? scored.reduce((sum: number, row: any) => sum + (row.onTimeRate || 0), 0) / scored.length
+                          : 0;
+                        return avg.toFixed(0);
+                      })()}%
                     </p>
                   </div>
                 </div>
@@ -138,14 +146,16 @@ export default async function KpiDepartmentPage() {
 
             {/* Department ranking table */}
             <KpiDepartmentTable
-              data={departmentData.map((row: any) => ({
-                userId: row.userId,
-                userName: row.user?.fullName || row.user?.displayName || "N/A",
-                totalScore: row.totalScore,
-                grade: row.grade,
-                tasksDone: row.taskBreakdown?.length || 0,
-                onTimeRate: row.onTimeRate,
-              }))}
+              data={departmentData
+                .filter((r: any) => r.totalScore != null)
+                .map((row: any) => ({
+                  userId: row.userId,
+                  userName: row.name || "N/A",
+                  totalScore: row.totalScore,
+                  grade: row.grade as any,
+                  tasksDone: row.tasksDone ?? 0,
+                  onTimeRate: row.onTimeRate ?? 0,
+                }))}
             />
 
             {/* Grade distribution */}
