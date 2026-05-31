@@ -9,6 +9,7 @@ export interface KpiActor {
   id: string;
   role: UserRole;
   departmentId: string | null;
+  teamId: string | null;
 }
 
 export async function getKpiActor(): Promise<
@@ -27,7 +28,7 @@ export async function getKpiActor(): Promise<
 
     const profile = await prisma.profile.findUnique({
       where: { id: user.id },
-      select: { id: true, role: true, departmentId: true, status: true },
+      select: { id: true, role: true, departmentId: true, teamId: true, status: true },
     });
 
     if (!profile || profile.status !== "ACTIVE") {
@@ -39,6 +40,7 @@ export async function getKpiActor(): Promise<
         id: profile.id,
         role: profile.role,
         departmentId: profile.departmentId,
+        teamId: profile.teamId,
       },
     };
   } catch {

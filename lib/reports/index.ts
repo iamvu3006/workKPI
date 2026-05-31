@@ -3,6 +3,9 @@ import { calculateKpiFromTasks } from "@/lib/kpi/calculator";
 
 import type { KpiGrade } from "@prisma/client";
 
+export type ReportPeriod = "month" | "quarter" | "year";
+export type ProgressPeriod = "week" | "month" | "quarter" | "year";
+
 export interface MonthlyReportMember {
   userId: string;
   fullName: string | null;
@@ -16,6 +19,8 @@ export interface MonthlyReportMember {
 export interface MonthlyReport {
   month: number;
   year: number;
+  period?: ReportPeriod;
+  periodLabel?: string;
   department: { id: string; name: string } | null;
   kpiCalculated: boolean;
   summary: {
@@ -41,18 +46,118 @@ export interface WeeklyReport {
   comparedToPrevWeek: { done: number; onTimeRate: number };
 }
 
+export interface ProgressReport extends WeeklyReport {
+  period: ProgressPeriod;
+  periodLabel: string;
+}
+
 export interface CompanyKpiReport {
   month: number;
   year: number;
+  period?: ReportPeriod;
+  periodLabel?: string;
   departments: Array<{ department_id: string; department_name: string; avg_score: number | null; member_count: number; rank: number }>;
   topPerformers: Array<{ userId: string; fullName: string | null; departmentName: string | null; totalScore: number; grade: KpiGrade }>;
   onTimeRate: number;
+}
+
+interface PeriodContext {
+  period: ReportPeriod;
+  month: number;
+  year: number;
+  start: Date;
+  end: Date;
+  months: Array<{ month: number; year: number }>;
+  previousMonths: Array<{ month: number; year: number }>;
+  label: string;
 }
 
 function getMonthRange(month: number, year: number) {
   const start = new Date(Date.UTC(year, month - 1, 1));
   const end = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
   return { start, end };
+}
+
+function toReportPeriod(value: string | null | undefined): ReportPeriod {
+  if (value === "quarter" || value === "year") return value;
+  return "month";
+}
+
+function getQuarterFromMonth(month: number) {
+  return Math.ceil(month / 3);
+}
+
+function getPeriodContext({ month, year, period }: { month: number; year: number; period?: ReportPeriod }): PeriodContext {
+  const resolvedPeriod = period ?? "month";
+
+  if (resolvedPeriod === "year") {
+    return {
+      period: resolvedPeriod,
+      month,
+      year,
+      start: new Date(Date.UTC(year, 0, 1)),
+      end: new Date(Date.UTC(year, 11, 31, 23, 59, 59, 999)),
+      months: Array.from({ length: 12 }, (_, index) => ({ month: index + 1, year })),
+      previousMonths: Array.from({ length: 12 }, (_, index) => ({ month: index + 1, year: year - 1 })),
+      label: `Năm ${year}`,
+    };
+  }
+
+  if (resolvedPeriod === "quarter") {
+    const quarter = getQuarterFromMonth(month);
+    const startMonth = (quarter - 1) * 3 + 1;
+    const endMonth = startMonth + 2;
+    const prevQuarter = quarter === 1 ? 4 : quarter - 1;
+    const prevYear = quarter === 1 ? year - 1 : year;
+    const prevStartMonth = (prevQuarter - 1) * 3 + 1;
+
+    return {
+      period: resolvedPeriod,
+      month,
+      year,
+      start: new Date(Date.UTC(year, startMonth - 1, 1)),
+      end: new Date(Date.UTC(year, endMonth, 0, 23, 59, 59, 999)),
+      months: [
+        { month: startMonth, year },
+        { month: startMonth + 1, year },
+        { month: startMonth + 2, year },
+      ],
+      previousMonths: [
+        { month: prevStartMonth, year: prevYear },
+        { month: prevStartMonth + 1, year: prevYear },
+        { month: prevStartMonth + 2, year: prevYear },
+      ],
+      label: `Quý ${quarter}/${year}`,
+    };
+  }
+
+  const { start, end } = getMonthRange(month, year);
+  const prevMonth = month === 1 ? 12 : month - 1;
+  const prevYear = month === 1 ? year - 1 : year;
+
+  return {
+    period: "month",
+    month,
+    year,
+    start,
+    end,
+    months: [{ month, year }],
+    previousMonths: [{ month: prevMonth, year: prevYear }],
+    label: `Tháng ${month}/${year}`,
+  };
+}
+
+function toMonthYearOr(whereItems: Array<{ month: number; year: number }>) {
+  return whereItems.map((item) => ({ month: item.month, year: item.year }));
+}
+
+function getMonday(date = new Date()) {
+  const current = new Date(date);
+  const day = current.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  current.setDate(current.getDate() + diff);
+  current.setHours(0, 0, 0, 0);
+  return current;
 }
 
 function toWeekRange(weekStart: string) {
@@ -63,17 +168,105 @@ function toWeekRange(weekStart: string) {
   return { start, end };
 }
 
-export async function getMonthlyReport({ departmentId, month, year }: {
+function getProgressRange({
+  period,
+  weekStart,
+  month,
+  year,
+}: {
+  period: ProgressPeriod;
+  weekStart?: string;
+  month?: number;
+  year?: number;
+}) {
+  const current = new Date();
+  const referenceMonth = month ?? current.getMonth() + 1;
+  const referenceYear = year ?? current.getFullYear();
+
+  if (period === "week") {
+    const start = weekStart ? toWeekRange(weekStart).start : getMonday();
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+
+    const previousStart = new Date(start);
+    previousStart.setDate(previousStart.getDate() - 7);
+    const previousEnd = new Date(end);
+    previousEnd.setDate(previousEnd.getDate() - 7);
+
+    return {
+      start,
+      end,
+      previousStart,
+      previousEnd,
+      label: `Tuần ${start.toLocaleDateString("vi-VN")} - ${end.toLocaleDateString("vi-VN")}`,
+    };
+  }
+
+  if (period === "quarter") {
+    const quarter = Math.ceil(referenceMonth / 3);
+    const startMonth = (quarter - 1) * 3 + 1;
+    const endMonth = startMonth + 2;
+    const start = new Date(Date.UTC(referenceYear, startMonth - 1, 1));
+    const end = new Date(Date.UTC(referenceYear, endMonth, 0, 23, 59, 59, 999));
+
+    const prevQuarter = quarter === 1 ? 4 : quarter - 1;
+    const prevYear = quarter === 1 ? referenceYear - 1 : referenceYear;
+    const prevStartMonth = (prevQuarter - 1) * 3 + 1;
+    const previousStart = new Date(Date.UTC(prevYear, prevStartMonth - 1, 1));
+    const previousEnd = new Date(Date.UTC(prevYear, prevStartMonth + 2, 0, 23, 59, 59, 999));
+
+    return {
+      start,
+      end,
+      previousStart,
+      previousEnd,
+      label: `Quý ${quarter}/${referenceYear}`,
+    };
+  }
+
+  if (period === "year") {
+    const start = new Date(Date.UTC(referenceYear, 0, 1));
+    const end = new Date(Date.UTC(referenceYear, 11, 31, 23, 59, 59, 999));
+    const previousStart = new Date(Date.UTC(referenceYear - 1, 0, 1));
+    const previousEnd = new Date(Date.UTC(referenceYear - 1, 11, 31, 23, 59, 59, 999));
+
+    return {
+      start,
+      end,
+      previousStart,
+      previousEnd,
+      label: `Năm ${referenceYear}`,
+    };
+  }
+
+  const { start, end } = getMonthRange(referenceMonth, referenceYear);
+  const prevMonth = referenceMonth === 1 ? 12 : referenceMonth - 1;
+  const prevYear = referenceMonth === 1 ? referenceYear - 1 : referenceYear;
+  const { start: previousStart, end: previousEnd } = getMonthRange(prevMonth, prevYear);
+
+  return {
+    start,
+    end,
+    previousStart,
+    previousEnd,
+    label: `Tháng ${referenceMonth}/${referenceYear}`,
+  };
+}
+
+export async function getMonthlyReport({ departmentId, month, year, period }: {
   departmentId?: string | null;
   month: number;
   year: number;
+  period?: ReportPeriod;
 }): Promise<MonthlyReport> {
   // Fetch department if provided
   const department = departmentId
     ? await prisma.department.findUnique({ where: { id: departmentId }, select: { id: true, name: true } })
     : null;
 
-  const { start, end } = getMonthRange(month, year);
+  const periodContext = getPeriodContext({ month, year, period });
+  const { start, end, months, previousMonths } = periodContext;
 
   // Find all profiles in department (or all if none)
   const profiles = await prisma.profile.findMany({
@@ -83,29 +276,35 @@ export async function getMonthlyReport({ departmentId, month, year }: {
       fullName: true,
       email: true,
       kpiRecords: {
-        where: { month, year },
+        where: { OR: toMonthYearOr(months) },
+        orderBy: [{ year: "asc" }, { month: "asc" }],
         select: { totalScore: true, grade: true, taskBreakdown: true, onTimeRate: true },
       },
     },
   });
 
   const members = profiles.map((p) => {
-    const rec = p.kpiRecords?.[0];
+    const records = Array.isArray(p.kpiRecords) ? p.kpiRecords : [];
+    const latestRecord = records[records.length - 1];
+    const scoreCount = records.length;
+    const totalScore = records.reduce((sum, rec) => sum + rec.totalScore, 0);
+    const totalOnTimeRate = records.reduce((sum, rec) => sum + rec.onTimeRate, 0);
+    const tasksCompleted = records.reduce((sum, rec) => sum + (Array.isArray(rec.taskBreakdown) ? rec.taskBreakdown.length : 0), 0);
+
     return {
       userId: p.id,
       fullName: p.fullName ?? null,
       email: p.email,
-      kpiScore: rec?.totalScore ?? null,
-      grade: rec?.grade ?? null,
-      tasksCompleted: Array.isArray(rec?.taskBreakdown) ? rec!.taskBreakdown.length : 0,
-      onTimeRate: rec?.onTimeRate ?? null,
+      kpiScore: scoreCount ? Math.round((totalScore / scoreCount) * 100) / 100 : null,
+      grade: latestRecord?.grade ?? null,
+      tasksCompleted,
+      onTimeRate: scoreCount ? Math.round((totalOnTimeRate / scoreCount) * 100) / 100 : null,
     };
   });
 
   const kpiRecordCount = await prisma.kpiRecord.count({
     where: {
-      month,
-      year,
+      OR: toMonthYearOr(months),
       ...(departmentId ? { user: { departmentId } } : {}),
     },
   });
@@ -147,12 +346,9 @@ export async function getMonthlyReport({ departmentId, month, year }: {
     onTimeRate: members.length ? Math.round((members.reduce((s, m) => s + (m.onTimeRate ?? 0), 0) / members.length) * 100) / 100 : 0,
   };
 
-  const prevMonth = month === 1 ? 12 : month - 1;
-  const prevYear = month === 1 ? year - 1 : year;
   const prevMonthScores = await prisma.kpiRecord.findMany({
     where: {
-      month: prevMonth,
-      year: prevYear,
+      OR: toMonthYearOr(previousMonths),
       ...(departmentId ? { user: { departmentId } } : {}),
     },
     select: { totalScore: true },
@@ -166,6 +362,8 @@ export async function getMonthlyReport({ departmentId, month, year }: {
   return {
     month,
     year,
+    period: periodContext.period,
+    periodLabel: periodContext.label,
     department: department ? { id: department.id, name: department.name } : null,
     kpiCalculated: kpiRecordCount > 0,
     summary,
@@ -235,58 +433,122 @@ export async function getMonthlyReportPaginated({ departmentId, month, year, pag
   } as any;
 }
 
-export async function getCompanyKpi({ month, year }: { month: number; year: number }): Promise<CompanyKpiReport> {
-  const departmentRows = await prisma.$queryRawUnsafe<Array<{ department_id: string; department_name: string; avg_score: number | null; member_count: number }>>(
-    `
-    SELECT d.id as department_id, d.name as department_name, AVG(k.total_score) as avg_score, COUNT(DISTINCT p.id) as member_count
-    FROM departments d
-    LEFT JOIN profiles p ON p.department_id = d.id
-    LEFT JOIN kpi_records k ON k.user_id = p.id AND k.month = $1 AND k.year = $2
-    GROUP BY d.id, d.name
-    ORDER BY avg_score DESC NULLS LAST, d.name ASC
-  `,
-    month,
-    year
-  );
+export async function getCompanyKpi({ month, year, period }: { month: number; year: number; period?: ReportPeriod }): Promise<CompanyKpiReport> {
+  const periodContext = getPeriodContext({ month, year, period });
 
-  const departments = departmentRows.map((row, index) => ({
-    ...row,
-    rank: index + 1,
-  }));
+  const [departmentList, records] = await Promise.all([
+    prisma.department.findMany({
+      select: { id: true, name: true, _count: { select: { members: true } } },
+      orderBy: { name: "asc" },
+    }),
+    prisma.kpiRecord.findMany({
+      where: { OR: toMonthYearOr(periodContext.months) },
+      include: {
+        user: {
+          select: {
+            id: true,
+            fullName: true,
+            departmentId: true,
+            department: { select: { name: true } },
+          },
+        },
+      },
+    }),
+  ]);
 
-  const topRecords = await prisma.kpiRecord.findMany({
-    where: { month, year },
-    orderBy: { totalScore: "desc" },
-    take: 5,
-    include: { user: { select: { id: true, fullName: true, departmentId: true, department: { select: { name: true } } } } },
-  });
+  const deptAgg = new Map<string, { total: number; count: number }>();
+  const userAgg = new Map<string, { userId: string; fullName: string | null; departmentName: string | null; total: number; count: number; grade: KpiGrade }>();
 
-  const onTimeRows = await prisma.kpiRecord.findMany({
-    where: { month, year },
-    select: { onTimeRate: true },
-  });
+  for (const record of records) {
+    const deptId = record.user.departmentId;
+    if (deptId) {
+      const existingDept = deptAgg.get(deptId) ?? { total: 0, count: 0 };
+      existingDept.total += record.totalScore;
+      existingDept.count += 1;
+      deptAgg.set(deptId, existingDept);
+    }
 
-  const onTimeRate = onTimeRows.length
-    ? Math.round((onTimeRows.reduce((sum, record) => sum + record.onTimeRate, 0) / onTimeRows.length) * 100) / 100
+    const existingUser = userAgg.get(record.user.id) ?? {
+      userId: record.user.id,
+      fullName: record.user.fullName ?? null,
+      departmentName: record.user.department?.name ?? null,
+      total: 0,
+      count: 0,
+      grade: record.grade,
+    };
+    existingUser.total += record.totalScore;
+    existingUser.count += 1;
+    existingUser.grade = record.grade;
+    userAgg.set(record.user.id, existingUser);
+  }
+
+  const departments = departmentList
+    .map((dept) => {
+      const agg = deptAgg.get(dept.id);
+      const avgScore = agg && agg.count ? Math.round((agg.total / agg.count) * 100) / 100 : null;
+      return {
+        department_id: dept.id,
+        department_name: dept.name,
+        avg_score: avgScore,
+        member_count: dept._count.members,
+        rank: 0,
+      };
+    })
+    .sort((a, b) => {
+      if (a.avg_score === null && b.avg_score === null) return a.department_name.localeCompare(b.department_name);
+      if (a.avg_score === null) return 1;
+      if (b.avg_score === null) return -1;
+      return b.avg_score - a.avg_score;
+    })
+    .map((item, index) => ({ ...item, rank: index + 1 }));
+
+  const topPerformers = Array.from(userAgg.values())
+    .map((item) => ({
+      userId: item.userId,
+      fullName: item.fullName,
+      departmentName: item.departmentName,
+      totalScore: Math.round((item.total / item.count) * 100) / 100,
+      grade: item.grade,
+    }))
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .slice(0, 20);
+
+  const onTimeRate = records.length
+    ? Math.round((records.reduce((sum, record) => sum + record.onTimeRate, 0) / records.length) * 100) / 100
     : 0;
 
   return {
     month,
     year,
+    period: periodContext.period,
+    periodLabel: periodContext.label,
     departments,
-    topPerformers: topRecords.map((record) => ({
-      userId: record.user.id,
-      fullName: record.user.fullName ?? null,
-      departmentName: record.user.department?.name ?? null,
-      totalScore: record.totalScore,
-      grade: record.grade,
-    })),
+    topPerformers,
     onTimeRate,
   };
 }
 
-export async function getWeeklyReport({ departmentId, weekStart }: { departmentId?: string | null; weekStart: string }): Promise<WeeklyReport> {
+export async function getWeeklyReport({
+  departmentId,
+  weekStart,
+  assigneeId,
+  teamId,
+}: {
+  departmentId?: string | null;
+  weekStart: string;
+  assigneeId?: string;
+  teamId?: string;
+}): Promise<WeeklyReport> {
   const { start, end } = toWeekRange(weekStart);
+
+  const scopedAssigneeIds = teamId
+    ? (
+      await prisma.profile.findMany({
+        where: { teamId, status: "ACTIVE" },
+        select: { id: true },
+      })
+    ).map((profile) => profile.id)
+    : null;
 
   const department = departmentId
     ? await prisma.department.findUnique({ where: { id: departmentId }, select: { id: true, name: true } })
@@ -298,6 +560,10 @@ export async function getWeeklyReport({ departmentId, weekStart }: { departmentI
     OR: [{ updatedAt: { gte: start, lte: end } }, { completedAt: { gte: start, lte: end } }],
   };
   if (departmentId) where.departmentId = departmentId;
+  if (assigneeId) where.assignees = { some: { assigneeId } };
+  if (scopedAssigneeIds) {
+    where.assignees = { some: { assigneeId: { in: scopedAssigneeIds } } };
+  }
 
   const tasks = await prisma.task.findMany({
     where,
@@ -347,6 +613,10 @@ export async function getWeeklyReport({ departmentId, weekStart }: { departmentI
     OR: [{ updatedAt: { gte: prevStart, lte: prevEnd } }, { completedAt: { gte: prevStart, lte: prevEnd } }],
   };
   if (departmentId) prevWhere.departmentId = departmentId;
+  if (assigneeId) prevWhere.assignees = { some: { assigneeId } };
+  if (scopedAssigneeIds) {
+    prevWhere.assignees = { some: { assigneeId: { in: scopedAssigneeIds } } };
+  }
 
   const prevTasks = await prisma.task.findMany({
     where: prevWhere,
@@ -376,6 +646,143 @@ export async function getWeeklyReport({ departmentId, weekStart }: { departmentI
   return {
     weekStart: start.toISOString(),
     weekEnd: end.toISOString(),
+    department: department ? { id: department.id, name: department.name } : null,
+    tasksByStatus,
+    onTimeRate,
+    comparedToPrevWeek: {
+      done: tasksByStatus.done - prevDone,
+      onTimeRate: Math.round((onTimeRate - prevOnTimeRate) * 100) / 100,
+    },
+  };
+}
+
+export async function getProgressReport({
+  period,
+  weekStart,
+  month,
+  year,
+  departmentId,
+  assigneeId,
+  teamId,
+}: {
+  period: ProgressPeriod;
+  weekStart?: string;
+  month?: number;
+  year?: number;
+  departmentId?: string | null;
+  assigneeId?: string;
+  teamId?: string;
+}): Promise<ProgressReport> {
+  const range = getProgressRange({ period, weekStart, month, year });
+
+  const scopedAssigneeIds = teamId
+    ? (
+      await prisma.profile.findMany({
+        where: { teamId, status: "ACTIVE" },
+        select: { id: true },
+      })
+    ).map((profile) => profile.id)
+    : null;
+
+  const department = departmentId
+    ? await prisma.department.findUnique({ where: { id: departmentId }, select: { id: true, name: true } })
+    : null;
+
+  const where: any = {
+    deletedAt: null,
+    createdAt: { lte: range.end },
+    OR: [{ updatedAt: { gte: range.start, lte: range.end } }, { completedAt: { gte: range.start, lte: range.end } }],
+  };
+  if (departmentId) where.departmentId = departmentId;
+  if (assigneeId) where.assignees = { some: { assigneeId } };
+  if (scopedAssigneeIds) {
+    where.assignees = { some: { assigneeId: { in: scopedAssigneeIds } } };
+  }
+
+  const tasks = await prisma.task.findMany({
+    where,
+    select: {
+      status: true,
+      completedAt: true,
+      deadline: true,
+      statusHistory: {
+        where: { createdAt: { lte: range.end } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { toStatus: true },
+      },
+    },
+  });
+
+  const statusAtRangeEnd = (task: (typeof tasks)[number]) => task.statusHistory[0]?.toStatus ?? task.status;
+
+  const tasksByStatus = tasks.reduce(
+    (acc, task) => {
+      const snapshotStatus = statusAtRangeEnd(task);
+      if (snapshotStatus === "DONE") acc.done += 1;
+      else if (snapshotStatus === "IN_PROGRESS") acc.inProgress += 1;
+      else if (snapshotStatus === "PENDING") acc.pending += 1;
+      else if (snapshotStatus === "REVIEW") acc.review += 1;
+      return acc;
+    },
+    { done: 0, inProgress: 0, pending: 0, review: 0 }
+  );
+
+  const completed = tasks.filter((task) => statusAtRangeEnd(task) === "DONE" && task.completedAt);
+  const onTime = completed.filter((task) => {
+    const deadline = new Date(task.deadline);
+    deadline.setHours(23, 59, 59, 999);
+    return task.completedAt! <= deadline;
+  }).length;
+  const onTimeRate = completed.length ? Math.round((onTime / completed.length) * 10000) / 100 : 0;
+
+  let previousStart = new Date(range.previousStart);
+  let previousEnd = new Date(range.previousEnd);
+  if (period === "week") {
+    // already aligned by getProgressRange
+  }
+
+  const prevWhere: any = {
+    deletedAt: null,
+    createdAt: { lte: previousEnd },
+    OR: [{ updatedAt: { gte: previousStart, lte: previousEnd } }, { completedAt: { gte: previousStart, lte: previousEnd } }],
+  };
+  if (departmentId) prevWhere.departmentId = departmentId;
+  if (assigneeId) prevWhere.assignees = { some: { assigneeId } };
+  if (scopedAssigneeIds) {
+    prevWhere.assignees = { some: { assigneeId: { in: scopedAssigneeIds } } };
+  }
+
+  const prevTasks = await prisma.task.findMany({
+    where: prevWhere,
+    select: {
+      status: true,
+      completedAt: true,
+      deadline: true,
+      statusHistory: {
+        where: { createdAt: { lte: previousEnd } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { toStatus: true },
+      },
+    },
+  });
+
+  const prevStatusAtRangeEnd = (task: (typeof prevTasks)[number]) => task.statusHistory[0]?.toStatus ?? task.status;
+  const prevDone = prevTasks.filter((task) => prevStatusAtRangeEnd(task) === "DONE").length;
+  const prevCompleted = prevTasks.filter((task) => prevStatusAtRangeEnd(task) === "DONE" && task.completedAt);
+  const prevOnTime = prevCompleted.filter((task) => {
+    const deadline = new Date(task.deadline);
+    deadline.setHours(23, 59, 59, 999);
+    return task.completedAt! <= deadline;
+  }).length;
+  const prevOnTimeRate = prevCompleted.length ? Math.round((prevOnTime / prevCompleted.length) * 10000) / 100 : 0;
+
+  return {
+    period,
+    periodLabel: range.label,
+    weekStart: range.start.toISOString(),
+    weekEnd: range.end.toISOString(),
     department: department ? { id: department.id, name: department.name } : null,
     tasksByStatus,
     onTimeRate,

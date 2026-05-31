@@ -95,7 +95,7 @@ function getNavItems(role: DashboardRole) {
     return [
       ...base,
       { href: "/dashboard/kpi", label: "Điểm KPI", description: "Theo dõi hiệu suất" },
-      { href: "/dashboard/reports/monthly", label: "Báo cáo", description: "Thống kê tháng" },
+      { href: "/dashboard/reports?period=week", label: "Báo cáo", description: "Tiến độ cá nhân" },
     ];
   }
 
@@ -103,8 +103,7 @@ function getNavItems(role: DashboardRole) {
     return [
       ...base,
       { href: "/dashboard/kpi/department", label: "KPI Team", description: "Hiệu suất nhóm" },
-      { href: "/dashboard/reports/weekly", label: "Báo cáo tuần", description: "Nhịp làm việc tuần" },
-      { href: "/dashboard/reports/monthly", label: "Báo cáo tháng", description: "Tổng hợp hiệu suất" },
+      { href: "/dashboard/reports?period=week", label: "Báo cáo tiến độ", description: "Nhịp làm việc team" },
     ];
   }
 
@@ -112,7 +111,7 @@ function getNavItems(role: DashboardRole) {
     return [
       ...base,
       { href: "/dashboard/kpi/department", label: "KPI Phòng", description: "Hiệu suất phòng ban" },
-      { href: "/dashboard/reports/company", label: "Báo cáo chung", description: "Góc nhìn vận hành" },
+      { href: "/dashboard/reports?period=month", label: "Báo cáo phòng", description: "Tháng / Quý / Năm" },
       { href: "/admin/departments", label: "Sơ đồ tổ chức", description: "Phòng ban & Team" },
     ];
   }
@@ -121,7 +120,7 @@ function getNavItems(role: DashboardRole) {
     return [
       ...base,
       { href: "/dashboard/kpi", label: "KPI Công ty", description: "Chỉ số toàn công ty" },
-      { href: "/dashboard/reports/company", label: "Báo cáo tổng", description: "Bức tranh toàn cảnh" },
+      { href: "/dashboard/reports?period=month", label: "Báo cáo tổng", description: "Tháng / Quý / Năm" },
       { href: "/admin/users", label: "Thành viên", description: "Tài khoản nhân sự" },
     ];
   }
@@ -130,7 +129,7 @@ function getNavItems(role: DashboardRole) {
     ...base,
     { href: "/admin/users", label: "Quản trị User", description: "Danh sách tài khoản" },
     { href: "/admin/departments", label: "Quản trị Phòng", description: "Cấu trúc phòng ban" },
-    { href: "/dashboard/reports/company", label: "Báo cáo hệ thống", description: "Thống kê dữ liệu" },
+    { href: "/dashboard/reports?period=month", label: "Báo cáo hệ thống", description: "Thống kê dữ liệu" },
   ];
 }
 
@@ -145,7 +144,7 @@ function getActionItems(role: DashboardRole) {
   } else if (role === "LEADER") {
     actions.push({ href: "/dashboard/tasks", label: "Duyệt task nhóm", variant: "ghost" });
   } else if (role === "MANAGER") {
-    actions.push({ href: "/dashboard/reports/company", label: "Xem báo cáo phòng", variant: "ghost" });
+    actions.push({ href: "/dashboard/reports?period=month", label: "Xem báo cáo phòng", variant: "ghost" });
   } else if (role === "DIRECTOR") {
     actions.push({ href: "/dashboard/kpi", label: "Kiểm tra KPI", variant: "ghost" });
   } else {
@@ -707,7 +706,7 @@ export async function DashboardHomeShell() {
               <div className="flex flex-wrap gap-2 shrink-0">
                 <ActionLink href="/dashboard/tasks/new" label="Tạo công việc" />
                 <ActionLink href="/dashboard/tasks" label="Mở danh sách Tasks" variant="outline" />
-                <ActionLink href="/dashboard/reports/monthly" label="Xem báo cáo" variant="ghost" />
+                <ActionLink href="/dashboard/reports?period=month" label="Xem báo cáo" variant="ghost" />
                 <ActionLink href="/dashboard/ai" label="Trợ lý AI" variant="ghost" />
               </div>
             </div>

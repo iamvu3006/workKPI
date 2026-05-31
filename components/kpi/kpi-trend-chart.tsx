@@ -34,8 +34,9 @@ export function KpiTrendChart({ data }: KpiTrendChartProps) {
         {/* Chart bars */}
         <div className="flex items-end gap-2">
           {data.map((point, idx) => {
-            const heightPercent = ((point.score - minScore) / range) * 100;
-            const isGood = point.score >= 75;
+            const score = Number.isFinite(point.score) ? point.score : 0;
+            const heightPercent = ((score - minScore) / range) * 100;
+            const isGood = score >= 75;
 
             return (
               <div key={idx} className="flex flex-1 flex-col items-center gap-2">
@@ -50,7 +51,7 @@ export function KpiTrendChart({ data }: KpiTrendChartProps) {
                 </div>
                 {/* Label */}
                 <div className="text-center">
-                  <p className="text-xs font-semibold text-slate-900">{point.score.toFixed(1)}</p>
+                  <p className="text-xs font-semibold text-slate-900">{score.toFixed(1)}</p>
                   <p className="text-xs text-slate-500">
                     {MONTH_NAMES[point.month - 1]?.slice(0, 3)} {point.year}
                   </p>

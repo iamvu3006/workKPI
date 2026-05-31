@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { prisma } from "@/lib/db/prisma";
+import { countTaskBreakdownItems } from "@/lib/kpi/task-breakdown";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function KpiDepartmentPage() {
@@ -143,7 +144,7 @@ export default async function KpiDepartmentPage() {
                 userName: row.user?.fullName || row.user?.displayName || "N/A",
                 totalScore: row.totalScore,
                 grade: row.grade,
-                tasksDone: row.taskBreakdown?.length || 0,
+                tasksDone: countTaskBreakdownItems(row.taskBreakdown),
                 onTimeRate: row.onTimeRate,
               }))}
             />

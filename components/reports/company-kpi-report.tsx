@@ -1,6 +1,14 @@
 import React from "react";
 
-export default function CompanyKpiComponent({ data, error }: { data: any; error?: string | null }) {
+export default function CompanyKpiComponent({
+  data,
+  error,
+  exportUrl,
+}: {
+  data: any;
+  error?: string | null;
+  exportUrl?: string | null;
+}) {
   if (error) {
     return (
       <section className="space-y-4">
@@ -28,11 +36,19 @@ export default function CompanyKpiComponent({ data, error }: { data: any; error?
 
   return (
     <section className="space-y-6">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-sm text-slate-600">Tháng {data.month}/{data.year}</p>
+          <p className="text-sm text-slate-600">{data.periodLabel ?? `Tháng ${data.month}/${data.year}`}</p>
           <p className="mt-1 text-sm text-slate-600">Tỷ lệ đúng hạn toàn công ty: {data.onTimeRate ?? 0}%</p>
         </div>
+        {exportUrl ? (
+          <a
+            href={exportUrl}
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+          >
+            Export Excel
+          </a>
+        ) : null}
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -41,7 +57,7 @@ export default function CompanyKpiComponent({ data, error }: { data: any; error?
           <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{departments.length}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Top 5 nhân viên</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Top 20 nhân viên</p>
           <p className="mt-2 text-2xl font-bold tabular-nums text-slate-900">{topPerformers.length}</p>
         </div>
       </div>
@@ -55,7 +71,7 @@ export default function CompanyKpiComponent({ data, error }: { data: any; error?
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
                 <div
                   className="h-full rounded-full bg-emerald-500 transition-all"
-                  style={{ width: `${Math.min(100, Number(d.avg_score ?? 0) * 10)}%` }}
+                  style={{ width: `${Math.max(0, Math.min(100, Number(d.avg_score ?? 0)))}%` }}
                 />
               </div>
               <span className="w-12 text-right text-sm font-semibold tabular-nums text-slate-900">{Number(d.avg_score ?? 0).toFixed(2)}</span>
@@ -92,7 +108,7 @@ export default function CompanyKpiComponent({ data, error }: { data: any; error?
       </div>
 
       <div>
-        <h3 className="text-base font-semibold text-slate-900">Top 5 nhân viên</h3>
+        <h3 className="text-base font-semibold text-slate-900">Top 20 nhân viên</h3>
         <ol className="mt-2 space-y-2">
           {topPerformers.map((item: any) => (
             <li key={item.userId} className="text-sm text-slate-700">
