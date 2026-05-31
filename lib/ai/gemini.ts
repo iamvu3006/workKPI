@@ -11,6 +11,8 @@ type GeminiRequest = {
 type GeminiSuccess = { text: string };
 type GeminiFailure = { error: string; code: string; status: number };
 
+const GEMINI_MAX_OUTPUT_TOKENS = 2048;
+
 function getBaseUrl() {
   return (process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta").replace(/\/$/, "");
 }
@@ -51,7 +53,7 @@ export async function generateGeminiReply({ systemInstruction, contents }: Gemin
         contents,
         generationConfig: {
           temperature: 0.3,
-          maxOutputTokens: 1024,
+          maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS,
         },
       }),
     });

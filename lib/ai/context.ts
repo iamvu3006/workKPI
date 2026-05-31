@@ -275,35 +275,40 @@ export async function buildAiContext(actor: AiActor): Promise<GeminiContext> {
   ].join("; ");
 
   const recentTaskText = recentTasks.length
-    ? recentTasks.map((task) => `- ${formatTaskLine({ ...task, assigneeCount: task._count.assignees })}`).join("\n")
-    : "- Không có task phù hợp trong phạm vi được cấp.";
+    ? recentTasks.map((task, index) => `${index + 1}. ${formatTaskLine({ ...task, assigneeCount: task._count.assignees })}`).join("\n")
+    : "1. Không có task phù hợp trong phạm vi được cấp.";
 
   const kpiSummaryText =
     actor.role === "EMPLOYEE"
       ? kpiRecords.length > 0
         ? kpiRecords
             .map(
-              (record) =>
-                `- KPI ${record.month}/${record.year}: ${record.totalScore ?? "chưa tính"} điểm, ${record.grade}, on-time ${record.onTimeRate ?? "-"}%`
+              (record, index) =>
+                `${index + 1}. KPI ${record.month}/${record.year}: ${record.totalScore ?? "chưa tính"} điểm, ${record.grade}, on-time ${record.onTimeRate ?? "-"}%`
             )
             .join("\n")
-        : "- Chưa có KPI cá nhân trong phạm vi hiện tại."
+        : "1. Chưa có KPI cá nhân trong phạm vi hiện tại."
       : kpiRecords.length > 0
         ? kpiRecords
-            .map((record: any) => {
+            .map((record: any, index) => {
               const name = record.name || record.user?.displayName || record.user?.fullName || record.user?.email || record.userId;
               const departmentName = record.departmentName || record.user?.department?.name || "không rõ";
-              return `- ${name} (${departmentName}): ${record.totalScore ?? "chưa tính"} điểm, ${record.grade}, on-time ${record.onTimeRate ?? "-"}%`;
+              return `${index + 1}. ${name} (${departmentName}): ${record.totalScore ?? "chưa tính"} điểm, ${record.grade}, on-time ${record.onTimeRate ?? "-"}%`;
             })
             .join("\n")
-        : "- Chưa có KPI phù hợp trong phạm vi hiện tại.";
+        : "1. Chưa có KPI phù hợp trong phạm vi hiện tại.";
 
   const scopeText = buildScopeText(actor);
   const systemInstruction = [
     "Bạn là trợ lý AI nội bộ của WorkKPI.",
-    "Luôn trả lời bằng tiếng Việt, ngắn gọn, chính xác, và ưu tiên gạch đầu dòng khi có nhiều ý.",
-    "Chỉ sử dụng dữ liệu trong ngữ cảnh được cấp. Không bịa thêm thông tin, không tiết lộ dữ liệu ngoài phạm vi.",
-    "Nếu dữ liệu không đủ để trả lời, hãy nói rõ là chưa đủ thông tin.",
+    "Luôn trả lời bằng tiếng Việt tự nhiên, rõ ràng, thực tế. Ngắn gọn nhưng phải đủ ý, không trả lời cụt.",
+    "Chỉ dựa trên dữ liệu trong ngữ cảnh được cấp. Không bịa thêm thông tin và không tiết lộ dữ liệu ngoài phạm vi quyền của người dùng.",
+    "Nếu dữ liệu không đủ để trả lời, hãy nói rõ điều gì chưa có hoặc chưa đủ.",
+    "Không dùng Markdown dưới mọi hình thức. Không dùng bold, bullet, heading, hoặc code block.",
+    "Nếu cần liệt kê, chỉ dùng số thứ tự 1., 2., 3. và giữ nội dung ngắn.",
+    "Luôn ưu tiên kết luận hữu ích trước, sau đó nêu hành động tiếp theo nếu cần. Khi có đủ dữ liệu, phải có ít nhất 1 câu kết luận và 1 câu gợi ý hành động tiếp theo.",
+    "Luôn viết câu hoàn chỉnh và kết thúc gọn gàng, không ngắt câu giữa chừng.",
+    "Nếu người dùng hỏi về phòng ban hoặc team, luôn trả lời theo đúng cấu trúc: 1. Tình hình chung 2. Task cần ưu tiên 3. Lý do ưu tiên 4. Gợi ý tiếp theo. Mỗi mục nên có 1 đến 2 câu ngắn.",
     `Người dùng hiện tại: ${actor.displayName || actor.fullName || actor.email} (${ROLE_LABELS[actor.role]})`,
     `Phạm vi được phép: ${scopeText}`,
     `Phòng ban: ${actor.department ? `${actor.department.name} (${actor.department.code})` : "không có"}`,

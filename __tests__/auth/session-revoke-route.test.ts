@@ -95,12 +95,8 @@ describe("POST /api/auth/sessions/:id/revoke", () => {
     expect(await response.json()).toEqual({
       success: true,
       data: {
-        session: {
-          id: "550e8400-e29b-41d4-a716-446655440000",
-          deviceName: "MacBook Pro",
-          revokedAt: "2026-05-13T01:00:00.000Z",
-          isCurrent: false,
-        },
+        revokedSessionId: "550e8400-e29b-41d4-a716-446655440000",
+        revokedAt: "2026-05-13T01:00:00.000Z",
       },
     });
     expect(mocks.writeAuditLog).toHaveBeenCalledWith(

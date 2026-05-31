@@ -87,7 +87,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
     return NextResponse.json({
       success: true,
       data: {
-        session: revokedSession,
+        revokedSessionId: revokedSession.id,
+        revokedAt: revokedSession.revokedAt?.toISOString() ?? new Date().toISOString(),
       },
     });
   } catch {

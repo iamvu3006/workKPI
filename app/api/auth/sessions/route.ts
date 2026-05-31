@@ -40,13 +40,13 @@ export async function GET(request: NextRequest) {
 
     const [sessions, total] = await Promise.all([
       prisma.userSession.findMany({
-        where: { userId: user.id },
+        where: { userId: user.id, revokedAt: null },
         orderBy: { lastSeenAt: "desc" },
         skip,
         take: limit,
       }),
       prisma.userSession.count({
-        where: { userId: user.id },
+        where: { userId: user.id, revokedAt: null },
       }),
     ]);
 
