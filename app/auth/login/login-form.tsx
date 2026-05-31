@@ -216,7 +216,7 @@ export function LoginForm() {
       </div>
 
       {/* Google SSO Button */}
-      <button
+      <Button
         type="button"
         variant="outline"
         onClick={handleGoogleSignIn}
@@ -232,7 +232,7 @@ export function LoginForm() {
           </g>
         </svg>
         <span>Đăng nhập bằng Google</span>
-      </button>
+      </Button>
     </div>
   );
 }

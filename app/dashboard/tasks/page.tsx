@@ -40,32 +40,35 @@ export default async function TasksKanbanPage() {
   const isManager = profile.role === "MANAGER" || profile.role === "ADMIN";
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-8">
-      <div className="mx-auto max-w-[1400px] space-y-6">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-teal-700">Tasks</p>
-            <h1 className="text-2xl font-semibold text-slate-900">Kanban Board</h1>
-          </div>
-          <nav className="flex gap-3 text-sm">
-            {isManager && (
-              <Link href="/dashboard/tasks/list" className="text-teal-700 hover:underline">
-                List view
-              </Link>
-            )}
-            <Link href="/dashboard" className="text-slate-500 hover:text-slate-800">
-              Dashboard
-            </Link>
-          </nav>
-        </header>
-
-        <div className="rounded-xl border border-slate-200 bg-white px-5 py-4 shadow-sm max-w-md">
-          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">Trọng số tháng của bạn</p>
-          <WeightProgressBar total={weightTotal} />
+    <div className="space-y-5">
+      {/* Simplified header wrapper */}
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-teal-700">Tasks</p>
+          <h1 className="text-xl font-bold text-slate-900 mt-0.5">Bảng Kanban Board</h1>
         </div>
+        <nav className="flex items-center gap-3 text-xs font-semibold">
+          {isManager && (
+            <Link href="/dashboard/tasks/list" className="text-teal-700 hover:text-teal-800 border-r border-slate-200 pr-3">
+              Chuyển sang dạng Bảng (List view)
+            </Link>
+          )}
+          <Link href="/dashboard" className="text-slate-500 hover:text-slate-800">
+            Tổng quan
+          </Link>
+        </nav>
+      </header>
 
+      {/* Weight Widget đặt ngang thanh thoát phía trên Kanban Board */}
+      <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm max-w-md">
+        <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Trọng số tháng của bạn</p>
+        <WeightProgressBar total={weightTotal} />
+      </div>
+
+      {/* Kanban Board tràn viền rộng rãi */}
+      <div className="min-w-0">
         <KanbanBoard canCreate={canCreate} />
       </div>
-    </main>
+    </div>
   );
 }

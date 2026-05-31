@@ -4,10 +4,6 @@ import { redirect } from "next/navigation";
 
 import { DashboardView, type DashboardRole } from "@/components/dashboard/dashboard-view";
 import { Button } from "@/components/ui/button";
-import { GlobalSearch } from "@/components/layout/global-search";
-import { NotificationBell } from "../notifications/notification-bell";
-import { NotificationToast } from "../notifications/notification-toast";
-import { SignOutButton } from "@/components/auth/sign-out-button";
 import { prisma } from "@/lib/db/prisma";
 import { calculateKpiEstimate } from "@/lib/kpi/calculator";
 import { monthBounds } from "@/lib/kpi/month-range";
@@ -82,111 +78,6 @@ const ROLE_META = {
   },
 } satisfies Record<DashboardRole, { caption: string; title: string; description: string; accent: string; badge: string }>;
 
-function getNavItems(role: DashboardRole) {
-  const base = [
-    { href: "/dashboard", label: "Tổng quan", description: "Bảng điều khiển chính" },
-    { href: "/dashboard/tasks", label: "Công việc", description: "Danh sách và luồng xử lý" },
-    { href: "/dashboard/notifications", label: "Thông báo", description: "Tín hiệu hoạt động" },
-    { href: "/dashboard/profile", label: "Cá nhân", description: "Hồ sơ của bạn" },
-  ];
-
-  if (role === "EMPLOYEE") {
-    return [
-      ...base,
-      { href: "/dashboard/kpi", label: "Điểm KPI", description: "Theo dõi hiệu suất" },
-      { href: "/dashboard/reports/monthly", label: "Báo cáo", description: "Thống kê tháng" },
-    ];
-  }
-
-  if (role === "LEADER") {
-    return [
-      ...base,
-      { href: "/dashboard/kpi/department", label: "KPI Team", description: "Hiệu suất nhóm" },
-      { href: "/dashboard/reports/weekly", label: "Báo cáo tuần", description: "Nhịp làm việc tuần" },
-      { href: "/dashboard/reports/monthly", label: "Báo cáo tháng", description: "Tổng hợp hiệu suất" },
-    ];
-  }
-
-  if (role === "MANAGER") {
-    return [
-      ...base,
-      { href: "/dashboard/kpi/department", label: "KPI Phòng", description: "Hiệu suất phòng ban" },
-      { href: "/dashboard/reports/company", label: "Báo cáo chung", description: "Góc nhìn vận hành" },
-      { href: "/admin/departments", label: "Sơ đồ tổ chức", description: "Phòng ban & Team" },
-    ];
-  }
-
-  if (role === "DIRECTOR") {
-    return [
-      ...base,
-      { href: "/dashboard/kpi", label: "KPI Công ty", description: "Chỉ số toàn công ty" },
-      { href: "/dashboard/reports/company", label: "Báo cáo tổng", description: "Bức tranh toàn cảnh" },
-      { href: "/admin/users", label: "Thành viên", description: "Tài khoản nhân sự" },
-    ];
-  }
-
-  return [
-    ...base,
-    { href: "/admin/users", label: "Quản trị User", description: "Danh sách tài khoản" },
-    { href: "/admin/departments", label: "Quản trị Phòng", description: "Cấu trúc phòng ban" },
-    { href: "/dashboard/reports/company", label: "Báo cáo hệ thống", description: "Thống kê dữ liệu" },
-  ];
-}
-
-function getActionItems(role: DashboardRole) {
-  const actions: { href: string; label: string; variant?: "default" | "outline" | "ghost" }[] = [
-    // { href: "/dashboard/tasks/new", label: "Tạo việc mới" },
-    { href: "/dashboard/notifications", label: "Mở hộp thư", variant: "outline" },
-  ];
-
-  if (role === "EMPLOYEE") {
-    actions.push({ href: "/dashboard/profile/settings", label: "Cài đặt cá nhân", variant: "ghost" });
-  } else if (role === "LEADER") {
-    actions.push({ href: "/dashboard/tasks", label: "Duyệt task nhóm", variant: "ghost" });
-  } else if (role === "MANAGER") {
-    actions.push({ href: "/dashboard/reports/company", label: "Xem báo cáo phòng", variant: "ghost" });
-  } else if (role === "DIRECTOR") {
-    actions.push({ href: "/dashboard/kpi", label: "Kiểm tra KPI", variant: "ghost" });
-  } else {
-    actions.push({ href: "/admin/users", label: "Quản trị tài khoản", variant: "ghost" });
-  }
-
-  return actions;
-}
-
-function SidebarLink({
-  href,
-  label,
-  description,
-  active,
-}: {
-  href: string;
-  label: string;
-  description: string;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`group flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 transition-all duration-150 ${
-        active
-          ? "border-teal-500/20 bg-teal-500/5 text-teal-700 font-semibold"
-          : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-      }`}
-    >
-      <div>
-        <span className="block text-xs font-semibold">{label}</span>
-        <span className={`mt-0.5 block text-[10px] ${active ? "text-teal-600/80" : "text-slate-400 group-hover:text-slate-500"}`}>
-          {description}
-        </span>
-      </div>
-      <span className={`text-[9px] font-bold uppercase tracking-wider opacity-0 transition-opacity group-hover:opacity-100 ${active ? "text-teal-600" : "text-slate-400"}`}>
-        Mở
-      </span>
-    </Link>
-  );
-}
-
 function ActionLink({
   href,
   label,
@@ -200,21 +91,6 @@ function ActionLink({
     <Button asChild variant={variant} size="sm" className="rounded-xl px-4 font-semibold text-xs h-9 cursor-pointer">
       <Link href={href}>{label}</Link>
     </Button>
-  );
-}
-
-function WorkspaceStat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-2.5 flex items-center justify-between">
-      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</span>
-      <span className="text-xs font-bold text-slate-800">{value}</span>
-    </div>
   );
 }
 
@@ -581,220 +457,120 @@ async function loadDashboardHomeData() {
 
 export async function DashboardHomeShell() {
   const data = await loadDashboardHomeData();
-  const roleMeta = ROLE_META[data.profile.role];
-  const navItems = getNavItems(data.profile.role);
-  const actionItems = getActionItems(data.profile.role);
+  const roleMeta = ROLE_META[data.profile.role as DashboardRole];
 
   return (
-    <main className="min-h-screen w-full bg-slate-50/50 px-4 py-4 text-slate-900 sm:px-6 lg:px-8">
-      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-[1500px] gap-5 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-6">
-        <NotificationToast />
-
-        {/* Sidebar Navigation */}
-        <aside className="hidden lg:sticky lg:top-4 lg:block lg:h-[calc(100vh-2rem)]">
-          <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm">
-            {/* Minimalist User Info */}
-            <div className="border-b border-slate-100 bg-slate-50/50 p-4.5">
-              <div className="flex items-center justify-between gap-2.5">
-                <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">WorkKPI</p>
-                  <h1 className="mt-1.5 text-base font-extrabold tracking-tight text-slate-950 truncate">
-                    {data.normalizeName(data.profile)}
-                  </h1>
-                </div>
-                <span className="rounded-lg bg-slate-100 px-2 py-1 text-[9px] font-bold text-slate-700 uppercase shrink-0 border border-slate-200/30">
-                  {ROLE_LABELS[data.profile.role]}
-                </span>
-              </div>
-              <p className="mt-2.5 text-xs text-slate-500 font-medium truncate">
-                {data.profile.department?.name ?? "Chưa gán phòng"}
+    <div className="flex flex-col gap-4 lg:gap-5">
+      {/* Clean Role Welcome Banner */}
+      <div className="rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-sm">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div className="max-w-3xl space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-600">
+                {roleMeta.caption}
+              </span>
+              <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-teal-50/80 text-teal-700 border-teal-200/50`}>
+                {data.formatMonthLabel(data.now)}
+              </span>
+              <span className="rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5 text-[9px] font-semibold text-slate-500">
+                {data.profile.department?.name ?? "Không thuộc phòng ban"}
                 {data.profile.team?.name ? ` · ${data.profile.team.name}` : ""}
+              </span>
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">
+                {roleMeta.title}
+              </h2>
+              <p className="mt-1 text-xs sm:text-sm text-slate-500 leading-relaxed max-w-2xl">
+                {roleMeta.description}
               </p>
             </div>
-
-            {/* Sidebar Navigation Links */}
-            <div className="flex-1 overflow-y-auto p-3 space-y-4">
-              <div className="grid gap-1">
-                {navItems.map((item) => (
-                  <SidebarLink
-                    key={item.href}
-                    href={item.href}
-                    label={item.label}
-                    description={item.description}
-                    active={item.href === "/dashboard"}
-                  />
-                ))}
-              </div>
-
-              {/* Minimal Today Widgets */}
-              <div className="grid gap-1.5 rounded-xl border border-slate-100 bg-slate-50/30 p-3">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-1">Hôm nay</p>
-                <WorkspaceStat label="Chưa đọc" value={`${data.unreadCount > 99 ? "99+" : data.unreadCount}`} />
-                <WorkspaceStat label="Đang chạy" value={String(data.activeTasks.length)} />
-                <WorkspaceStat label="Đến hạn" value={String(data.dueToday.length)} />
-              </div>
-
-              {/* Minimalist Action Center */}
-              <div className="rounded-xl border border-slate-100 p-3 bg-white">
-                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 px-1 mb-2">Thao tác nhanh</p>
-                <div className="grid gap-1.5">
-                  {actionItems.map((action) => (
-                    <ActionLink key={action.href} href={action.href} label={action.label} variant={action.variant} />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* Main Content Workspace */}
-        <section className="flex min-w-0 flex-col gap-4 lg:gap-5">
-          {/* Top Horizontal Navigation Bar */}
-          <header className="flex h-14 items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white px-4.5 shadow-sm backdrop-blur-sm">
-            {/* Centered Global Search */}
-            <div className="w-full max-w-md">
-              <GlobalSearch />
-            </div>
-
-            {/* Quick Actions & Profiles */}
-            <div className="flex items-center gap-3">
-              {/* Notifications bell */}
-              <NotificationBell initialUnreadCount={data.unreadCount} initialNotifications={data.notifications} />
-              
-              <div className="h-5 w-[1px] bg-slate-200" />
-              
-              {/* Active Month indicator */}
-              <div className="hidden sm:block rounded-xl border border-slate-100 bg-slate-50/80 px-3 py-1.5 text-right shrink-0">
-                <div className="text-[8px] font-bold uppercase tracking-wider text-slate-400">Tháng hiện tại</div>
-                <div className="text-[11px] font-bold text-slate-800 leading-tight">{data.formatMonthLabel(data.now)}</div>
-              </div>
-
-              <div className="h-5 w-[1px] bg-slate-200 hidden sm:block" />
-
-              {/* Sign-out button */}
-              <SignOutButton />
-            </div>
-          </header>
-
-          {/* Clean Role Welcome Banner */}
-          <div className="rounded-2xl border border-slate-200/80 bg-white px-5 py-5 shadow-sm">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-              <div className="max-w-3xl space-y-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-slate-100 border border-slate-200 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-600">
-                    {roleMeta.caption}
-                  </span>
-                  <span className={`rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${roleMeta.badge}`}>
-                    {data.formatMonthLabel(data.now)}
-                  </span>
-                  <span className="rounded-full border border-slate-100 bg-slate-50 px-2.5 py-0.5 text-[9px] font-semibold text-slate-500">
-                    {data.profile.department?.name ?? "Không thuộc phòng ban"}
-                    {data.profile.team?.name ? ` · ${data.profile.team.name}` : ""}
-                  </span>
-                </div>
-                <div>
-                  <h2 className="text-xl font-extrabold tracking-tight text-slate-950 sm:text-2xl">
-                    {roleMeta.title}
-                  </h2>
-                  <p className="mt-1 text-xs sm:text-sm text-slate-500 leading-relaxed max-w-2xl">
-                    {roleMeta.description}
-                  </p>
-                </div>
-              </div>
-
-              {/* Inline Action Buttons */}
-              <div className="flex flex-wrap gap-2 shrink-0">
-                <ActionLink href="/dashboard/tasks/new" label="Tạo công việc" />
-                <ActionLink href="/dashboard/tasks" label="Mở danh sách Tasks" variant="outline" />
-                <ActionLink href="/dashboard/reports/monthly" label="Xem báo cáo" variant="ghost" />
-              </div>
-            </div>
           </div>
 
-          {/* Active Data Dashboard Area */}
-          <DashboardView
-            role={data.profile.role}
-            profileName={data.normalizeName(data.profile)}
-            departmentName={data.profile.department?.name ?? null}
-            teamName={data.profile.team?.name ?? null}
-            unreadCount={data.unreadCount}
-            notifications={data.notifications}
-            summary={{
-              activeTasks: data.activeTasks.length,
-              dueToday: data.dueToday.length,
-              overdue: data.overdue.length,
-              kpiEstimate: data.profile.role === "EMPLOYEE" ? data.employeeEstimate.totalScore : data.companyAvg,
-              nearestDeadline: data.nearestDeadline
-                ? {
-                    title: data.nearestDeadline.title,
-                    deadline: data.formatRelativeDeadline(data.nearestDeadline.deadline),
-                    assignees: data.nearestDeadline.assignees.map((assignment) =>
-                      data.normalizeName(assignment.assignee)
-                    ),
-                    status: data.nearestDeadline.status,
-                  }
-                : null,
-            }}
-            statusCounts={data.countByStatus}
-            tasks={
-              data.profile.role === "DIRECTOR" || data.profile.role === "ADMIN"
-                ? []
-                : data.topUrgentTasks.map((task) => ({
-                    id: task.id,
-                    title: task.title,
-                    deadline: data.formatRelativeDeadline(task.deadline),
-                    priority: task.priority,
-                    progressPercent: task.progressPercent,
-                    assignees: task.assignees.map((assignment) => data.normalizeName(assignment.assignee)),
-                    status: task.status,
-                  }))
-            }
-            members={
-              data.profile.role === "DIRECTOR" || data.profile.role === "ADMIN"
-                ? []
-                : data.departmentMembers.map((member) => ({
-                    id: member.id,
-                    name: data.normalizeName(member),
-                    role: member.role,
-                    departmentName: member.department?.name ?? data.profile.department?.name ?? null,
-                    kpi: data.kpiByUser.get(member.id)?.totalScore ?? null,
-                    onTimeRate: data.kpiByUser.get(member.id)?.onTimeRate ?? null,
-                  }))
-            }
-            departments={data.departmentRows}
-            companyAvg={data.companyAvg}
-            forecast={data.forecast}
-            topPerformers={Array.from(data.kpiByUser.values())
-              .filter((item) => item.totalScore != null)
-              .sort((a, b) => b.totalScore - a.totalScore)
-              .slice(0, 5)
-              .map((item) => ({
-                name: item.name,
-                departmentName: item.departmentName,
-                score: item.totalScore,
-                grade: item.grade,
-              }))}
-            bottomPerformers={Array.from(data.kpiByUser.values())
-              .filter((item) => item.totalScore != null)
-              .sort((a, b) => a.totalScore - b.totalScore)
-              .slice(0, 5)
-              .map((item) => ({
-                name: item.name,
-                departmentName: item.departmentName,
-                score: item.totalScore,
-                grade: item.grade,
-              }))}
-          />
-        </section>
+          {/* Inline Action Buttons */}
+          <div className="flex flex-wrap gap-2 shrink-0">
+            <ActionLink href="/dashboard/tasks/new" label="Tạo công việc" />
+            <ActionLink href="/dashboard/tasks" label="Mở danh sách Tasks" variant="outline" />
+            <ActionLink href="/dashboard/reports/monthly" label="Xem báo cáo" variant="ghost" />
+            <ActionLink href="/dashboard/ai" label="Trợ lý AI" variant="ghost" />
+          </div>
+        </div>
       </div>
-    </main>
+
+      {/* Active Data Dashboard Area */}
+      <DashboardView
+        role={data.profile.role as DashboardRole}
+        profileName={data.normalizeName(data.profile)}
+        departmentName={data.profile.department?.name ?? null}
+        teamName={data.profile.team?.name ?? null}
+        unreadCount={data.unreadCount}
+        notifications={data.notifications}
+        summary={{
+          activeTasks: data.activeTasks.length,
+          dueToday: data.dueToday.length,
+          overdue: data.overdue.length,
+          kpiEstimate: data.profile.role === "EMPLOYEE" ? data.employeeEstimate.totalScore : data.companyAvg,
+          nearestDeadline: data.nearestDeadline
+            ? {
+                title: data.nearestDeadline.title,
+                deadline: data.formatRelativeDeadline(data.nearestDeadline.deadline),
+                assignees: data.nearestDeadline.assignees.map((assignment) =>
+                  data.normalizeName(assignment.assignee)
+                ),
+                status: data.nearestDeadline.status,
+              }
+            : null,
+        }}
+        statusCounts={data.countByStatus}
+        tasks={
+          data.profile.role === "DIRECTOR" || data.profile.role === "ADMIN"
+            ? []
+            : data.topUrgentTasks.map((task) => ({
+                id: task.id,
+                title: task.title,
+                deadline: data.formatRelativeDeadline(task.deadline),
+                priority: task.priority,
+                progressPercent: task.progressPercent,
+                assignees: task.assignees.map((assignment) => data.normalizeName(assignment.assignee)),
+                status: task.status,
+              }))
+        }
+        members={
+          data.profile.role === "DIRECTOR" || data.profile.role === "ADMIN"
+            ? []
+            : data.departmentMembers.map((member) => ({
+                id: member.id,
+                name: data.normalizeName(member),
+                role: member.role,
+                departmentName: member.department?.name ?? data.profile.department?.name ?? null,
+                kpi: data.kpiByUser.get(member.id)?.totalScore ?? null,
+                onTimeRate: data.kpiByUser.get(member.id)?.onTimeRate ?? null,
+              }))
+        }
+        departments={data.departmentRows}
+        companyAvg={data.companyAvg}
+        forecast={data.forecast}
+        topPerformers={Array.from(data.kpiByUser.values())
+          .filter((item) => item.totalScore != null)
+          .sort((a, b) => b.totalScore - a.totalScore)
+          .slice(0, 5)
+          .map((item) => ({
+            name: item.name,
+            departmentName: item.departmentName,
+            score: item.totalScore,
+            grade: item.grade,
+          }))}
+        bottomPerformers={Array.from(data.kpiByUser.values())
+          .filter((item) => item.totalScore != null)
+          .sort((a, b) => a.totalScore - b.totalScore)
+          .slice(0, 5)
+          .map((item) => ({
+            name: item.name,
+            departmentName: item.departmentName,
+            score: item.totalScore,
+            grade: item.grade,
+          }))}
+      />
+    </div>
   );
 }
-
-const ROLE_LABELS: Record<DashboardRole, string> = {
-  EMPLOYEE: "Nhân viên",
-  LEADER: "Leader",
-  MANAGER: "Trưởng phòng",
-  DIRECTOR: "Ban giám đốc",
-  ADMIN: "Quản trị viên",
-};

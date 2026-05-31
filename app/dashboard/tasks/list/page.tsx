@@ -2,7 +2,6 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { TaskSearch } from "@/components/tasks/task-search";
 import { TaskTable } from "@/components/tasks/task-table";
 import { prisma } from "@/lib/db/prisma";
 import { createClient } from "@/utils/supabase/server";
@@ -63,29 +62,29 @@ export default async function TasksListPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-8">
-      <div className="mx-auto max-w-6xl space-y-6">
-        <header className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-wider text-teal-700">Tasks</p>
-            <h1 className="text-2xl font-semibold text-slate-900">Danh sách phòng</h1>
-          </div>
-          <nav className="flex items-center gap-2 text-sm text-slate-500">
-            <Link href="/dashboard" className="hover:text-slate-900">Dashboard</Link>
-            <span>/</span>
-            <Link href="/dashboard/tasks" className="hover:text-slate-900">Tasks</Link>
-            <span>/</span>
-            <span className="text-slate-900">Danh sách</span>
-          </nav>
-        </header>
-        <TaskSearch />
-        <TaskTable
-          assignees={assignees.map(optionizePerson)}
-          creators={creators.map(optionizePerson)}
-          departments={departments.map((item) => ({ id: item.id, label: `${item.name} (${item.code})` }))}
-          defaultFilters={{ month: new Date().toISOString().slice(0, 7) }}
-        />
-      </div>
-    </main>
+    <div className="space-y-5">
+      {/* SaaS Premium Header Wrapper */}
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-teal-700">Tasks</p>
+          <h1 className="text-xl font-bold text-slate-900 mt-0.5">Danh sách công việc phòng ban</h1>
+        </div>
+        <nav className="flex items-center gap-3 text-xs font-semibold">
+          <Link href="/dashboard/tasks" className="text-teal-700 hover:text-teal-800 border-r border-slate-200 pr-3">
+            Bảng Kanban (Kanban Board)
+          </Link>
+          <Link href="/dashboard" className="text-slate-500 hover:text-slate-800">
+            Tổng quan
+          </Link>
+        </nav>
+      </header>
+
+      <TaskTable
+        assignees={assignees.map(optionizePerson)}
+        creators={creators.map(optionizePerson)}
+        departments={departments.map((item) => ({ id: item.id, label: `${item.name} (${item.code})` }))}
+        defaultFilters={{ month: new Date().toISOString().slice(0, 7) }}
+      />
+    </div>
   );
 }
