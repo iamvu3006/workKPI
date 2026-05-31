@@ -108,7 +108,7 @@ function getNavItems(role: DashboardRole) {
       ...base,
       { href: "/dashboard/kpi/department", label: "KPI Phòng", description: "Hiệu suất phòng ban" },
       { href: "/dashboard/reports?period=month", label: "Báo cáo phòng", description: "Tháng / Quý / Năm" },
-      { href: "/admin/departments", label: "Sơ đồ tổ chức", description: "Phòng ban & Team" },
+      // { href: "/admin/departments", label: "Sơ đồ tổ chức", description: "Phòng ban & Team" },
     ];
   }
 
