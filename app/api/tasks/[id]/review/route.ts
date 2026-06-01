@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 
 import { prisma } from "@/lib/db/prisma";
+import { calculateAndSaveKpiForUsers } from "@/lib/kpi/persist";
 import { applyOverduePenalty } from "@/lib/kpi/overdue-penalty";
 import { createNotification } from "@/lib/notifications";
 import { getTaskActor } from "@/lib/tasks/auth";
@@ -132,6 +133,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
         progressPercent,
       },
     });
+
+    const userIds = updated.assignees.map((a) => a.assigneeId);
+    if (userIds.length > 0) {
+      const month = approvedAt.getMonth() + 1;
+      const year = approvedAt.getFullYear();
+      await calculateAndSaveKpiForUsers(userIds, month, year, auth.actor.id);
+    }
 
     return taskSuccess(
       {

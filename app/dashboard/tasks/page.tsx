@@ -60,10 +60,10 @@ export default async function TasksKanbanPage() {
       </header>
 
       {/* Weight Widget đặt ngang thanh thoát phía trên Kanban Board */}
-      <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm max-w-md">
+      {/* <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 shadow-sm max-w-md">
         <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Trọng số tháng của bạn</p>
         <WeightProgressBar total={weightTotal} />
-      </div>
+      </div> */}
 
       {/* Kanban Board tràn viền rộng rãi */}
       <div className="min-w-0">

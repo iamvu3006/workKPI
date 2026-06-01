@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 
 import { prisma } from "@/lib/db/prisma";
+import { calculateAndSaveKpiForUsers } from "@/lib/kpi/persist";
 import { applyOverduePenalty } from "@/lib/kpi/overdue-penalty";
 import { getTaskActor } from "@/lib/tasks/auth";
 import { taskError, taskSuccess } from "@/lib/tasks/api-response";
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
 
     const approvedAt = new Date();
     let approved = 0;
+    const userIdsToRecalculate = new Set<string>();
 
     for (const task of tasks) {
       if (!canEditTaskMetadata(task, auth.actor)) continue;
@@ -76,7 +78,17 @@ export async function POST(request: NextRequest) {
         metadata: { bulk: true, qualityScore: penalty.qualityScoreAfterPenalty },
       });
 
+      for (const a of task.assignees) {
+        userIdsToRecalculate.add(a.assigneeId);
+      }
+
       approved += 1;
+    }
+
+    if (userIdsToRecalculate.size > 0) {
+      const month = approvedAt.getMonth() + 1;
+      const year = approvedAt.getFullYear();
+      await calculateAndSaveKpiForUsers(Array.from(userIdsToRecalculate), month, year, auth.actor.id);
     }
 
     return taskSuccess(
