@@ -1,201 +1,80 @@
 # WorkKPI
 
-WorkKPI là hệ thống quản trị công việc và đo lường KPI nội bộ cho doanh nghiệp. Dự án được xây dựng nhằm thay thế quy trình theo dõi thủ công bằng bảng tính, giúp doanh nghiệp quản lý công việc tập trung, theo dõi hiệu suất minh bạch và mở rộng hệ thống dễ dàng trong tương lai.
+> **An enterprise-grade internal task management and KPI measurement system**
 
-## Mục tiêu dự án
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/iamvu3006/workKPI)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-14.x+-success)](https://nextjs.org/)
+[![License](https://img.shields.io/badge/License-MIT-orange)](LICENSE)
 
-WorkKPI tập trung giải quyết các nhu cầu chính:
+## Table of Contents
 
-* Quản lý công việc theo phòng ban, nhân sự và vai trò.
-* Theo dõi KPI minh bạch, có dữ liệu rõ ràng.
-* Hỗ trợ phân quyền người dùng theo chức năng.
-* Đảm bảo bảo mật trong thao tác dữ liệu và xác thực.
-* Dễ bảo trì, dễ mở rộng và phù hợp với quy trình nội bộ doanh nghiệp.
+- [Overview](#overview)
+- [Quick Start](#quick-start)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+  - [Environment Setup](#environment-setup)
+  - [Database Setup](#database-setup)
+  - [Development](#development)
+- [Tech Stack](#tech-stack)
+- [Project Structure](#project-structure)
+- [Core Features](#core-features)
+- [API Conventions](#api-conventions)
+- [Security & Authorization](#security--authorization)
+- [Development Guidelines](#development-guidelines)
+- [Available Scripts](#available-scripts)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Support](#support)
 
-## Tài liệu dự án
+---
 
-Nguồn tài liệu chính nằm trong thư mục:
+## Overview
 
-```text
-docs/README.md
-```
+**WorkKPI** is a comprehensive internal task management and KPI (Key Performance Indicator) measurement platform designed to replace manual spreadsheet-based workflows. It enables enterprises to:
 
-Nên đọc tài liệu theo thứ tự sau:
+- **Centralize task management** across departments and teams
+- **Measure KPI transparently** with data-driven insights
+- **Enforce role-based access control** (RBAC) with multi-level permissions
+- **Automate KPI calculations** based on task completion and quality scores
+- **Streamline approval workflows** for task review and deadline extensions
+- **Generate actionable reports** for decision-makers at all levels
 
-1. [docs/PRD.md](docs/PRD.md)
-   Mô tả yêu cầu sản phẩm, mục tiêu, phạm vi và các chức năng chính.
+### Mission & Vision
 
-2. [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-   Mô tả kiến trúc hệ thống, phân quyền, auth, database và cách tổ chức mã nguồn.
+**Mission:** Digitize and automate internal work management and KPI tracking to replace fragmented tools (Google Sheets, messaging apps) and reduce reporting overhead.
 
-3. [docs/testing.md](docs/testing.md)
-   Mô tả định hướng kiểm thử, test case và các nhóm test quan trọng.
+**Vision:** Build a fast, reliable, transparent system that becomes the single source of truth for organizational performance tracking.
 
-4. [docs/TASKS.md](docs/TASKS.md)
-   Mô tả danh sách công việc, tiến độ và kế hoạch triển khai.
+### Target Users
 
-## Công nghệ sử dụng
+- **Executives (BGĐ):** Real-time company-wide KPI dashboards and trend analysis
+- **Department Managers (Trưởng phòng):** Team task oversight, KPI tracking, and performance reviews
+- **Team Leaders (Leader):** Task delegation, team progress monitoring, sub-task management
+- **Employees (Nhân viên):** Personal task tracking, KPI monitoring, deadline management
 
-Dự án sử dụng các công nghệ chính sau:
+### Success Metrics
 
-* Next.js App Router
-* TypeScript strict mode
-* Tailwind CSS
-* shadcn/ui
-* Radix UI
-* Supabase Auth
-* Supabase Database integration
-* Prisma ORM
-* PostgreSQL
-* Vitest
-* Testing Library
+- 100% user adoption for progress reporting
+- <15 minutes per week for executive summary generation
+- 99.9% system uptime and data safety guarantee
 
-## Cấu trúc thư mục
+---
 
-```text
-app/            # Pages, layouts, route handlers
-components/     # UI components và feature components
-lib/            # Domain logic, services, helpers
-utils/          # Shared utilities, bao gồm Supabase client/server
-prisma/         # Prisma schema, migrations, SQL scripts
-docs/           # PRD, architecture, testing, sprint plan
-__tests__/      # Unit tests và integration tests
-```
+## Quick Start
 
-## Yêu cầu môi trường
+### Prerequisites
 
-Trước khi chạy dự án, cần cài đặt:
+Ensure you have the following installed:
 
-* Node.js 20 trở lên
-* npm 10 trở lên
-* PostgreSQL hoặc Supabase project
+- **Node.js** 20+ ([download](https://nodejs.org/))
+- **npm** 10+ (comes with Node.js) or **pnpm**/**yarn**
+- **PostgreSQL** or **Supabase project** with database access
+- A code editor (VS Code recommended)
 
-Có thể dùng `npm`, `yarn` hoặc `pnpm`, nhưng mặc định tài liệu này sử dụng `npm`.
+### Installation
 
-## Biến môi trường
-
-Tạo file `.env.local` tại thư mục root của dự án.
-
-Cấu hình tối thiểu:
-
-```bash
-DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<db>?schema=public"
-NEXT_PUBLIC_SUPABASE_URL="https://<project-ref>.supabase.co"
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="<your-supabase-anon-or-publishable-key>"
-GEMINI_API_KEY="<google-gemini-api-key>"
-GEMINI_MODEL="gemini-3.5-flash"
-```
-
-Để chạy seed demo đầy đủ, bao gồm tạo Supabase Auth users, cần thêm:
-
-```bash
-SUPABASE_URL="https://<project-ref>.supabase.co"
-SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"
-```
-
-Nếu đã có `NEXT_PUBLIC_SUPABASE_URL`, script seed có thể dùng giá trị này thay cho `SUPABASE_URL`.
-
-Lưu ý: Không commit `.env.local` hoặc các khóa bí mật lên repository.
-
-## Cài đặt dự án
-
-### 1. Cài dependencies
-
-```bash
-npm install
-```
-
-### 2. Cấu hình biến môi trường
-
-Tạo file `.env.local` và điền đầy đủ các biến môi trường cần thiết như phần trên.
-
-### 3. Đồng bộ Prisma Client
-
-```bash
-npx prisma generate
-```
-
-### 4. Tạo dữ liệu demo
-
-```bash
-npm run seed
-```
-
-Script seed sẽ tạo lại dữ liệu demo, bao gồm:
-
-* Các bảng dữ liệu mẫu
-* Profile người dùng theo role
-* Task mẫu
-* KPI mẫu
-* Notification mẫu
-* Session mẫu
-* 11 tài khoản Supabase Auth tương ứng với email trong bảng `profiles`
-
-## Chạy dự án ở local
-
-Khởi động development server:
-
-```bash
-npm run dev
-```
-
-Sau đó mở trình duyệt tại:
-
-```text
-http://localhost:3000
-```
-
-## Các lệnh script quan trọng
-
-```bash
-npm run dev      # Chạy môi trường phát triển
-npm run build    # Build production
-npm run start    # Chạy bản production sau khi build
-npm run lint     # Kiểm tra lint
-npm run test     # Chạy test bằng Vitest
-npm run test:ui  # Chạy Vitest UI
-```
-
-## Quy ước phát triển
-
-Khi phát triển tính năng mới, cần tuân thủ các quy ước sau:
-
-* Ưu tiên sử dụng Server Components.
-* Chỉ dùng Client Components khi cần tương tác phía client.
-* API route phải trả response theo format thống nhất:
-
-```ts
-{
-  success: boolean;
-  data?: unknown;
-  error?: string;
-  code?: string;
-}
-```
-
-* Mọi thao tác liên quan đến database và authentication phải được validate ở phía server.
-* Mọi chức năng quan trọng phải kiểm tra phân quyền trước khi truy cập hoặc chỉnh sửa dữ liệu.
-* Không để logic nghiệp vụ phức tạp trực tiếp trong UI component.
-* Ưu tiên tách domain logic vào `lib/`.
-* Các utility dùng chung đặt trong `utils/`.
-* Test cần được bổ sung cho các luồng quan trọng như auth, phân quyền, task, KPI và API routes.
-
-## Ghi chú phát triển
-
-Một số tài liệu nên ưu tiên đọc khi cần mở rộng hoặc sửa hệ thống:
-
-* Bối cảnh sản phẩm và lộ trình sprint: [docs/README.md](docs/README.md)
-* Yêu cầu sản phẩm: [docs/PRD.md](docs/PRD.md)
-* Kiến trúc hệ thống, auth và phân quyền: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-* Kiểm thử hệ thống: [docs/testing.md](docs/testing.md)
-* Danh sách công việc: [docs/TASKS.md](docs/TASKS.md)
-
-Khi làm việc với auth và bảo mật, cần ưu tiên đọc `docs/ARCHITECTURE.md` và các test trong:
-
-```text
-__tests__/auth
-```
-
-## Tóm tắt
-
-WorkKPI là hệ thống quản trị công việc và đo lường KPI nội bộ, được xây dựng với Next.js, Supabase, Prisma và PostgreSQL. Dự án hướng đến khả năng quản lý tập trung, phân quyền rõ ràng, dữ liệu minh bạch và dễ mở rộng cho các nhu cầu quản trị doanh nghiệp.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/iamvu3006/workKPI.git
+   cd workKPI
